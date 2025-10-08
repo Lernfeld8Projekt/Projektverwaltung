@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService {
 
-    public String getCurrentJWT() {
+    public static String getCurrentJWT() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
