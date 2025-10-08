@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 public class ProjectService {
     private final CustomerService customerService;
     private final EmployeeService employeeService;
+    private final ProjectRepository projectRepository;
 
-    public ProjectService(CustomerService customerService, EmployeeService employeeService) {
+    public ProjectService(CustomerService customerService, EmployeeService employeeService, ProjectRepository projectRepository) {
         this.customerService = customerService;
         this.employeeService = employeeService;
+        this.projectRepository = projectRepository;
     }
 
     boolean validateAddProjectDTO(AddProjectDTO addProjectDTO){
@@ -29,4 +31,11 @@ public class ProjectService {
         }
         return true;
     };
+    public ProjectService(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
+
+    public ProjectEntity createProject(ProjectEntity projectEntity){
+        return this.projectRepository.save(projectEntity);
+    }
 }
