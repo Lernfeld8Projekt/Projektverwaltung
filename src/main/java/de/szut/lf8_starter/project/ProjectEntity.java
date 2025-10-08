@@ -29,7 +29,7 @@ public class ProjectEntity {
 
     private LocalDate plannedEndDate;
 
-    private LocalDate actualEndDate;
+    private LocalDate actualEndDate = null;
 
     @ElementCollection
     @CollectionTable(
