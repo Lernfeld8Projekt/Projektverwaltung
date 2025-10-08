@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MappingService {
-    ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO){
+    public ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO){
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setTitle(addProjectDTO.getTitle());
         projectEntity.setResponsibleEmployeeId(addProjectDTO.getResponsibleEmployeeId());
@@ -19,7 +19,7 @@ public class MappingService {
         return projectEntity;
     }
 
-    GetProjectDTO mapProjectEntityToGetProjectDTO(ProjectEntity projectEntity){
+    public GetProjectDTO mapProjectEntityToGetProjectDTO(ProjectEntity projectEntity){
         GetProjectDTO getProjectDTO = new GetProjectDTO();
         getProjectDTO.setId(projectEntity.getId());
         getProjectDTO.setTitle(projectEntity.getTitle());
