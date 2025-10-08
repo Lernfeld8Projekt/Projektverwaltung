@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Service
 public class EmployeeService {
-
     private final RestTemplate restTemplate;
     private String url = "https://employee-api.szut.dev/employees";
 
