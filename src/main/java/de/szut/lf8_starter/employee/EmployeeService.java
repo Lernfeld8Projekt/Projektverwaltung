@@ -26,7 +26,7 @@ public class EmployeeService {
         HttpEntity<Void> entity = getHttpEntityWithToken();
         String url = this.url + "/" + id;
 
-        ResponseEntity<Boolean> response = this.restTemplate.exchange(url, HttpMethod.GET, entity, Boolean.class);
+        ResponseEntity<String> response = this.restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             return true;

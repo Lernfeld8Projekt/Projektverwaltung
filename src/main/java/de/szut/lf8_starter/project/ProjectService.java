@@ -19,7 +19,7 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
-    boolean validateAddProjectDTO(AddProjectDTO addProjectDTO){
+    void validateAddProjectDTO(AddProjectDTO addProjectDTO){
         if(addProjectDTO.getStartDate().isAfter(addProjectDTO.getPlannedEndDate())){
             throw new DateNotValidException("Start date cannot be after planned end date!");
         }
@@ -29,11 +29,7 @@ public class ProjectService {
         if(!employeeService.checkIfEmployeeExists(addProjectDTO.getResponsibleEmployeeId())){
             throw new ResourceNotFoundException("Employee not found on id: " + addProjectDTO.getResponsibleEmployeeId());
         }
-        return true;
     };
-    public ProjectService(ProjectRepository projectRepository) {
-        this.projectRepository = projectRepository;
-    }
 
     public ProjectEntity createProject(ProjectEntity projectEntity){
         return this.projectRepository.save(projectEntity);

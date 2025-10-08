@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects")
-public class ProjectController {
+public class ProjectController implements ProjectControllerOpenAPI{
 
     private final MappingService mappingService;
     private final ProjectService projectService;
@@ -25,6 +25,7 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<GetProjectDTO> createProject(@Valid @RequestBody AddProjectDTO addProjectDTO) {
+        projectService.validateAddProjectDTO(addProjectDTO);
         ProjectEntity projectEntity = this.mappingService.mapAddProjectDTOtoProjectEntity(addProjectDTO);
         projectEntity = this.projectService.createProject(projectEntity);
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
