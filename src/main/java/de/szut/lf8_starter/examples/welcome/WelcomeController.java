@@ -1,4 +1,4 @@
-package de.szut.lf8_starter.welcome;
+package de.szut.lf8_starter.examples.welcome;
 
 
 

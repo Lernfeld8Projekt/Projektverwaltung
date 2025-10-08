@@ -1,4 +1,4 @@
-package de.szut.lf8_starter.hello.dto;
+package de.szut.lf8_starter.examples.hello.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.validation.constraints.Size;

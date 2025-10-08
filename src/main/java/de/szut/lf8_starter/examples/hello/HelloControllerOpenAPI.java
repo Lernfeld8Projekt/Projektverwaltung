@@ -1,14 +1,13 @@
-package de.szut.lf8_starter.hello;
+package de.szut.lf8_starter.examples.hello;
 
-import de.szut.lf8_starter.hello.dto.HelloCreateDto;
-import de.szut.lf8_starter.hello.dto.HelloGetDto;
+import de.szut.lf8_starter.examples.hello.dto.HelloCreateDto;
+import de.szut.lf8_starter.examples.hello.dto.HelloGetDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

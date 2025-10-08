@@ -1,8 +1,8 @@
 package de.szut.lf8_starter.config;
 
 
-import de.szut.lf8_starter.hello.HelloEntity;
-import de.szut.lf8_starter.hello.HelloRepository;
+import de.szut.lf8_starter.examples.hello.HelloEntity;
+import de.szut.lf8_starter.examples.hello.HelloRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
 package de.szut.lf8_starter.testcontainers;
 
-import de.szut.lf8_starter.hello.HelloRepository;
+import de.szut.lf8_starter.examples.hello.HelloRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
