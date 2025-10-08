@@ -19,6 +19,10 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
+    public ProjectEntity createProject(ProjectEntity projectEntity){
+        return this.projectRepository.save(projectEntity);
+    }
+
     void validateAddProjectDTO(AddProjectDTO addProjectDTO){
         if(addProjectDTO.getStartDate().isAfter(addProjectDTO.getPlannedEndDate())){
             throw new DateNotValidException("Start date cannot be after planned end date!");
@@ -30,8 +34,4 @@ public class ProjectService {
             throw new ResourceNotFoundException("Employee not found on id: " + addProjectDTO.getResponsibleEmployeeId());
         }
     };
-
-    public ProjectEntity createProject(ProjectEntity projectEntity){
-        return this.projectRepository.save(projectEntity);
-    }
 }
