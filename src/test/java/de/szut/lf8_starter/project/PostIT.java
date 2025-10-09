@@ -1,4 +1,4 @@
-package de.szut.lf8_starter.projects;
+package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
 import org.json.JSONObject;
@@ -29,7 +29,7 @@ public class PostIT extends AbstractIntegrationTest {
                 }
                 """;
 
-        final var contentAsString = this.mockMvc.perform(post("/projects")
+        final var contentAsString = this.mockMvc.perform(post("/project")
                         .content(content).contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
@@ -52,8 +52,9 @@ public class PostIT extends AbstractIntegrationTest {
                 }
                 """;
 
+
         //Body posten und überprüfen ob der JSON richtig formatiert ist
-        final var contentAsString = this.mockMvc.perform(post("/projects").content(content).contentType(MediaType.APPLICATION_JSON)
+        final var contentAsString = this.mockMvc.perform(post("/project").header("Authorization", "Bearer " + GetJWT.getToken()).content(content).contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("id").exists())
