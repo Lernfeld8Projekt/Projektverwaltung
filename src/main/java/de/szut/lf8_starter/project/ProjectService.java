@@ -4,7 +4,6 @@ import de.szut.lf8_starter.customer.CustomerService;
 import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
-import de.szut.lf8_starter.project.DTO.AddProjectDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +20,8 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
-    public ProjectEntity createProject(ProjectEntity projectEntity){
+    public ProjectEntity createProject(ProjectEntity projectEntity) {
+        validateAddProjectDTO(projectEntity);
         return this.projectRepository.save(projectEntity);
     }
 
@@ -33,15 +33,15 @@ public class ProjectService {
         return this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
     }
 
-    void validateAddProjectDTO(AddProjectDTO addProjectDTO){
-        if(addProjectDTO.getStartDate().isAfter(addProjectDTO.getPlannedEndDate())){
+    void validateAddProjectDTO(ProjectEntity projectEntity) {
+        if (projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
             throw new DateNotValidException("Start date cannot be after planned end date!");
         }
-        if(!customerService.checkIfCustomerExists(addProjectDTO.getCustomerId())){
-            throw new ResourceNotFoundException("Customer not found on id: " + addProjectDTO.getCustomerId());
+        if (!customerService.checkIfCustomerExists(projectEntity.getCustomerId())) {
+            throw new ResourceNotFoundException("Customer not found on id: " + projectEntity.getCustomerId());
         }
-        if(!employeeService.checkIfEmployeeExists(addProjectDTO.getResponsibleEmployeeId())){
-            throw new ResourceNotFoundException("Employee not found on id: " + addProjectDTO.getResponsibleEmployeeId());
+        if (!employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
+            throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
         }
-    };
+    }
 }
