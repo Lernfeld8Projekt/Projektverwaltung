@@ -7,6 +7,8 @@ import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_starter.project.DTO.AddProjectDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProjectService {
     private final CustomerService customerService;
@@ -21,6 +23,14 @@ public class ProjectService {
 
     public ProjectEntity createProject(ProjectEntity projectEntity){
         return this.projectRepository.save(projectEntity);
+    }
+
+    public List<ProjectEntity> getAllProjects() {
+        return this.projectRepository.findAll();
+    }
+
+    public ProjectEntity getProjectById(Long id) {
+        return this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
     }
 
     void validateAddProjectDTO(AddProjectDTO addProjectDTO){

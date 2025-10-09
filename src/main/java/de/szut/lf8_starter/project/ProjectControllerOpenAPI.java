@@ -1,7 +1,5 @@
 package de.szut.lf8_starter.project;
 
-import de.szut.lf8_starter.examples.hello.dto.HelloCreateDto;
-import de.szut.lf8_starter.examples.hello.dto.HelloGetDto;
 import de.szut.lf8_starter.project.DTO.AddProjectDTO;
 import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 public interface ProjectControllerOpenAPI {
     @Operation(summary = "creates a new project with its id, title," +
@@ -24,4 +24,24 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "401", description = "not authorized",
                     content = @Content)})
     ResponseEntity<GetProjectDTO> createProject(AddProjectDTO addProjectDTO);
+
+    @Operation(summary = "delivers a list of project objects")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of projects",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetProjectDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "not authorized",
+                    content = @Content)})
+    ResponseEntity<List<GetProjectDTO>> getAllProjects();
+
+    @Operation(summary = "delivers a project")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "project with given id",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetProjectDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "not authorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "resource not found",
+                    content = @Content)})
+    ResponseEntity<GetProjectDTO> getProjectById(Long id);
 }

@@ -4,15 +4,16 @@ import de.szut.lf8_starter.mapper.MappingService;
 import de.szut.lf8_starter.project.DTO.AddProjectDTO;
 import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
-@RequestMapping("/projects")
+@RequestMapping("/project")
 public class ProjectController implements ProjectControllerOpenAPI{
 
     private final MappingService mappingService;
@@ -30,6 +31,22 @@ public class ProjectController implements ProjectControllerOpenAPI{
         projectEntity = this.projectService.createProject(projectEntity);
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
 
-        return new ResponseEntity<>(projectDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(projectDTO, CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<GetProjectDTO>> getAllProjects(){
+        List<ProjectEntity> projects = this.projectService.getAllProjects();
+        List<GetProjectDTO> getProjectDTOList = new ArrayList<>();
+        for(ProjectEntity projectEntity : projects){
+            getProjectDTOList.add(this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity));
+        }
+        return new ResponseEntity<>(getProjectDTOList, OK);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<GetProjectDTO> getProjectById(@PathVariable Long id){
+        ProjectEntity project = this.projectService.getProjectById(id);
+        GetProjectDTO getProjectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(project);
+        return new ResponseEntity<>(getProjectDTO, OK);
     }
 }
