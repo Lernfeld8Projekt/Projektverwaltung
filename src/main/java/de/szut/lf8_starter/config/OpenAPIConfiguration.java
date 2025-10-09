@@ -33,7 +33,7 @@ public class OpenAPIConfiguration {
                 .info(new Info()
                         .title("LF8 project starter")
                         .description("\n## Auth\n" +
-                                "\n## Authentication\n" + "\nThis Hello service uses JWTs to authenticate requests. You will receive a bearer token by making a POST-Request in IntelliJ on:\n\n" +
+                                "\n## Authentication\n" + "\nThis Project service uses JWTs to authenticate requests. You will receive a bearer token by making a POST-Request in IntelliJ on:\n\n" +
                                 "\n" +
                                 "```\nPOST http://keycloak.szut.dev/auth/realms/szut/protocol/openid-connect/token\nContent-Type: application/x-www-form-urlencoded\ngrant_type=password&client_id=employee-management-service&username=user&password=test\n```\n" +
                                 "\n" +
