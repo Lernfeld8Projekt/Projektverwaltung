@@ -17,7 +17,6 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(ResourceNotFoundException.class)
     @ApiResponse(responseCode = "404", description = "Resource not found",
             content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
@@ -34,7 +33,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleDateNotValidException(DateNotValidException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, BAD_REQUEST);
-
     }
 
     @ApiResponse(responseCode = "500", description = "invalid JSON posted",
