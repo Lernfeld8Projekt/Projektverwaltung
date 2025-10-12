@@ -37,7 +37,7 @@ public class ProjectService {
 
     public void deleteProjectById(final Long id) {
         ProjectEntity projectEntity = this.projectRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Project with " + id + " not found."));
+                new ResourceNotFoundException("Project with ID " + id + " not found."));
         this.projectRepository.delete(projectEntity);
     }
 }
