@@ -24,4 +24,16 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "401", description = "not authorized",
                     content = @Content)})
     ResponseEntity<GetProjectDTO> createProject(AddProjectDTO addProjectDTO);
+
+    @Operation(summary = "Delete a project with its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Project Deleted",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "invalid JSON posted",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "ID not found",
+                    content = @Content),
+    @ApiResponse(responseCode = "500", description = "Invalid JSON posted",
+            content = @Content)})
+    ResponseEntity<Void> deleteProject(Long id);
 }

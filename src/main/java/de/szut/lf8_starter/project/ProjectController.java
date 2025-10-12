@@ -29,7 +29,7 @@ public class ProjectController implements ProjectControllerOpenAPI{
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProjectById(@PathVariable final Long id){
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id){
         projectService.deleteProjectById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
