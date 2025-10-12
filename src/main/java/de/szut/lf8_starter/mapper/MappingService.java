@@ -2,6 +2,7 @@ package de.szut.lf8_starter.mapper;
 
 import de.szut.lf8_starter.project.DTO.AddProjectDTO;
 import de.szut.lf8_starter.project.DTO.GetProjectDTO;
+import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
 import de.szut.lf8_starter.project.ProjectEntity;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,18 @@ public class MappingService {
         getProjectDTO.setPlannedEndDate(projectEntity.getPlannedEndDate());
         getProjectDTO.setActualEndDate(projectEntity.getActualEndDate());
         return getProjectDTO;
+    }
+
+    public ProjectEntity mapPatchProjectDTOtoProjectEntity(PatchProjectDTO patchProjectDTO) {
+        ProjectEntity projectEntity = new ProjectEntity();
+        projectEntity.setTitle(patchProjectDTO.getTitle());
+        projectEntity.setResponsibleEmployeeId(patchProjectDTO.getResponsibleEmployeeId() == null ? 0 : patchProjectDTO.getResponsibleEmployeeId());
+        projectEntity.setCustomerId(patchProjectDTO.getCustomerId() == null ? 0 : patchProjectDTO.getCustomerId());
+        projectEntity.setCustomerRepresentativeName(patchProjectDTO.getCustomerRepresentativeName());
+        projectEntity.setGoal(patchProjectDTO.getGoal());
+        projectEntity.setStartDate(patchProjectDTO.getStartDate());
+        projectEntity.setPlannedEndDate(patchProjectDTO.getPlannedEndDate());
+        projectEntity.setActualEndDate(patchProjectDTO.getActualEndDate());
+        return projectEntity;
     }
 }
