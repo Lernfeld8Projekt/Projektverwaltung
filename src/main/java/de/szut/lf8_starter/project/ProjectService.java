@@ -52,21 +52,26 @@ public class ProjectService {
             entityToPatch.setGoal(patchedEntity.getGoal());
         }
 
-        if (patchedEntity.getStartDate() != null) {
-            if (patchedEntity.getStartDate().isAfter(entityToPatch.getPlannedEndDate())){
+        if (patchedEntity.getStartDate() != null && patchedEntity.getPlannedEndDate() != null) {
+            if (patchedEntity.getStartDate().isAfter(patchedEntity.getPlannedEndDate())) {
                 throw new DateNotValidException("Start date cannot be after planned end date!");
             }
-            if (entityToPatch.getActualEndDate() != null && patchedEntity.getStartDate().isAfter(entityToPatch.getActualEndDate())) {
-                throw new DateNotValidException("Start date cannot be after the actual end date!");
-            }
             entityToPatch.setStartDate(patchedEntity.getStartDate());
-        }
-
-        if (patchedEntity.getPlannedEndDate() != null) {
-            if (patchedEntity.getPlannedEndDate().isBefore(entityToPatch.getStartDate())) {
-                throw new DateNotValidException("Planned end date cannot be before the start date!");
-            }
             entityToPatch.setPlannedEndDate(patchedEntity.getPlannedEndDate());
+        } else {
+            if (patchedEntity.getStartDate() != null) {
+                if (patchedEntity.getStartDate().isAfter(entityToPatch.getPlannedEndDate())) {
+                    throw new DateNotValidException("Start date cannot be after planned end date!");
+                }
+                entityToPatch.setStartDate(patchedEntity.getStartDate());
+            }
+
+            if (patchedEntity.getPlannedEndDate() != null) {
+                if (patchedEntity.getPlannedEndDate().isBefore(entityToPatch.getStartDate())) {
+                    throw new DateNotValidException("Planned end date cannot be before the start date!");
+                }
+                entityToPatch.setPlannedEndDate(patchedEntity.getPlannedEndDate());
+            }
         }
 
         if (patchedEntity.getActualEndDate() != null) {
@@ -76,7 +81,6 @@ public class ProjectService {
         }
 
         projectRepository.save(entityToPatch);
-
         return entityToPatch;
     }
 
