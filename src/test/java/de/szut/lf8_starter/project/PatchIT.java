@@ -34,6 +34,63 @@ public class PatchIT extends AbstractIntegrationTest {
 
     @Test
     @WithMockUser(roles = "user")
+    void projectDoesNotExists() throws Exception {
+
+        final String content = """
+                  {
+                    "title": "Miau",
+                    "responsibleEmployeeId": 2,
+                    "customerId": 6,
+                    "customerRepresentativeName": "Lukas Müller",
+                    "goal": "Hallo sagen können!",
+                    "startDate": "2025-07-07",
+                    "plannedEndDate": "2026-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(
+                        patch("/project/{id}", 1)
+                                .header("Authorization", "Bearer " + GetJWT.getToken())
+                                .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Project not found on id: 1")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void employeeDoesNotExists() throws Exception {
+        var projectEntity = new ProjectEntity();
+        projectEntity.setTitle("BFK");
+        projectEntity.setResponsibleEmployeeId(1L);
+        projectEntity.setCustomerId(1L);
+        projectEntity.setCustomerRepresentativeName("Max Meyer");
+        projectEntity.setGoal("Project fertig machen");
+        projectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        projectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+        projectRepository.save(projectEntity);
+
+        final String content = """
+                  {
+                    "title": "Miau",
+                    "responsibleEmployeeId": 42321087392164,
+                    "customerId": 6,
+                    "customerRepresentativeName": "Lukas Müller",
+                    "goal": "Hallo sagen können!",
+                    "startDate": "2025-07-07",
+                    "plannedEndDate": "2026-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(
+                        patch("/project/{id}", 1)
+                                .header("Authorization", "Bearer " + GetJWT.getToken())
+                                .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Employee not found on id: 42321087392164")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
     void updateWholeProjectAndFind() throws Exception {
         var projectEntity = new ProjectEntity();
         projectEntity.setTitle("BFK");
@@ -140,7 +197,7 @@ public class PatchIT extends AbstractIntegrationTest {
 
     @Test
     @WithMockUser(roles = "user")
-    void whenStartDateIsAfterPlannedEndDate_thenThrowDateNotValidException() throws Exception {
+    void whenStartDateIsAfterPlannedEndDateAndPlannedEndDateIsBeforeStartDate() throws Exception {
         var projectEntity = new ProjectEntity();
         projectEntity.setTitle("BFK");
         projectEntity.setResponsibleEmployeeId(1L);
@@ -165,4 +222,5 @@ public class PatchIT extends AbstractIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is("Start date cannot be after planned end date!")));
     }
+
 }

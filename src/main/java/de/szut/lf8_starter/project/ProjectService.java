@@ -37,7 +37,7 @@ public class ProjectService {
 
     public ProjectEntity patchProject(Long id, ProjectEntity patchedEntity) {
         ProjectEntity entityToPatch = this.projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Das Projekt mit der ID " + id + " konnte nicht gefunden werden."));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
 
         validateEmployeeAndCustomerExistence(patchedEntity);
 
@@ -89,13 +89,6 @@ public class ProjectService {
                     throw new DateNotValidException("Start date cannot be after planned end date!");
                 }
                 entityToPatch.setStartDate(patchedEntity.getStartDate());
-            }
-
-            if (patchedEntity.getPlannedEndDate() != null) {
-                if (patchedEntity.getPlannedEndDate().isBefore(entityToPatch.getStartDate())) {
-                    throw new DateNotValidException("Planned end date cannot be before the start date!");
-                }
-                entityToPatch.setPlannedEndDate(patchedEntity.getPlannedEndDate());
             }
         }
 
