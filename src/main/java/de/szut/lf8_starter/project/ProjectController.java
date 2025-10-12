@@ -6,10 +6,7 @@ import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/project")
@@ -29,5 +26,11 @@ public class ProjectController implements ProjectControllerOpenAPI{
         projectEntity = this.projectService.createProject(projectEntity);
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
         return new ResponseEntity<>(projectDTO, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProjectById(@PathVariable final Long id){
+        projectService.deleteProjectById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
