@@ -26,7 +26,7 @@ public class PatchIT extends AbstractIntegrationTest {
                 }
                 """;
 
-        final var contentAsString = this.mockMvc.perform(post("/project")
+        final var contentAsString = this.mockMvc.perform(patch("/project/{id}", 1)
                         .content(content).contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
