@@ -38,6 +38,8 @@ public interface ProjectControllerOpenAPI {
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "not authorized",
                     content = @Content),
+            @ApiResponse(responseCode = "404", description = "Project, Employee or Customer not found",
+                    content = @Content),
     })
     ResponseEntity<GetProjectDTO> updateProject(Long id,PatchProjectDTO patchProjectDTO);
 }
