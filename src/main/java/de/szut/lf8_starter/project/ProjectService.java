@@ -74,6 +74,9 @@ public class ProjectService {
                 throw new DateNotValidException("Actual end date cannot be before the start date!");
             }
         }
+
+        projectRepository.save(entityToPatch);
+
         return entityToPatch;
     }
 
