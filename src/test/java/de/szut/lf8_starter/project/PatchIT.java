@@ -39,21 +39,16 @@ public class PatchIT extends AbstractIntegrationTest {
         final String content = """
                   {
                     "title": "Miau",
-                    "responsibleEmployeeId": 2,
-                    "customerId": 6,
-                    "customerRepresentativeName": "Lukas Müller",
-                    "goal": "Hallo sagen können!",
-                    "startDate": "2025-07-07",
-                    "plannedEndDate": "2026-01-01"
+                    "responsibleEmployeeId": 2
                 }
                 """;
 
         this.mockMvc.perform(
-                        patch("/project/{id}", 1)
+                        patch("/project/{id}", 6725812)
                                 .header("Authorization", "Bearer " + GetJWT.getToken())
                                 .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message", is("Project not found on id: 1")));
+                .andExpect(jsonPath("$.message", is("Project not found on id: 6725812")));
     }
 
     @Test
@@ -221,6 +216,34 @@ public class PatchIT extends AbstractIntegrationTest {
                                 .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is("Start date cannot be after planned end date!")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void whenActualEndDateIsBeforeStartDateOrStartDateIsAfterActualEndDate() throws Exception {
+        var projectEntity = new ProjectEntity();
+        projectEntity.setTitle("BFK");
+        projectEntity.setResponsibleEmployeeId(1L);
+        projectEntity.setCustomerId(1L);
+        projectEntity.setCustomerRepresentativeName("Max Meyer");
+        projectEntity.setGoal("Project fertig machen");
+        projectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        projectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+        projectRepository.save(projectEntity);
+
+        final String content = """
+                  {
+                    "startDate": "2026-07-07",
+                    "actualEndDate": "2024-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(
+                        patch("/project/{id}", 1)
+                                .header("Authorization", "Bearer " + GetJWT.getToken())
+                                .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Actual end date cannot be before start date!")));
     }
 
 }

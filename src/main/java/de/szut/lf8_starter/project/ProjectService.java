@@ -6,6 +6,8 @@ import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class ProjectService {
     private final CustomerService customerService;
@@ -77,25 +79,36 @@ public class ProjectService {
     }
 
     private void updateDates(ProjectEntity entityToPatch, ProjectEntity patchedEntity) {
-        if (patchedEntity.getStartDate() != null && patchedEntity.getPlannedEndDate() != null) {
-            if (patchedEntity.getStartDate().isAfter(patchedEntity.getPlannedEndDate())) {
-                throw new DateNotValidException("Start date cannot be after planned end date!");
-            }
+        LocalDate startDate = patchedEntity.getStartDate() != null
+                ? patchedEntity.getStartDate()
+                : entityToPatch.getStartDate();
+
+        LocalDate plannedEndDate = patchedEntity.getPlannedEndDate() != null
+                ? patchedEntity.getPlannedEndDate()
+                : entityToPatch.getPlannedEndDate();
+
+        LocalDate actualEndDate = patchedEntity.getActualEndDate() != null
+                ? patchedEntity.getActualEndDate()
+                : entityToPatch.getActualEndDate();
+
+        if (actualEndDate != null && startDate != null && actualEndDate.isBefore(startDate)) {
+            throw new DateNotValidException("Actual end date cannot be before start date!");
+        }
+
+        if (startDate != null && plannedEndDate != null && startDate.isAfter(plannedEndDate)) {
+            throw new DateNotValidException("Start date cannot be after planned end date!");
+        }
+
+        if (patchedEntity.getStartDate() != null) {
             entityToPatch.setStartDate(patchedEntity.getStartDate());
+        }
+
+        if (patchedEntity.getPlannedEndDate() != null) {
             entityToPatch.setPlannedEndDate(patchedEntity.getPlannedEndDate());
-        } else {
-            if (patchedEntity.getStartDate() != null) {
-                if (patchedEntity.getStartDate().isAfter(entityToPatch.getPlannedEndDate())) {
-                    throw new DateNotValidException("Start date cannot be after planned end date!");
-                }
-                entityToPatch.setStartDate(patchedEntity.getStartDate());
-            }
         }
 
         if (patchedEntity.getActualEndDate() != null) {
-            if (entityToPatch.getActualEndDate() != null && patchedEntity.getActualEndDate().isBefore(entityToPatch.getActualEndDate())) {
-                throw new DateNotValidException("Actual end date cannot be before the start date!");
-            }
+            entityToPatch.setActualEndDate(patchedEntity.getActualEndDate());
         }
     }
 }
