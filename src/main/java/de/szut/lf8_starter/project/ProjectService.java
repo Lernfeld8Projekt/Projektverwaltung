@@ -23,26 +23,49 @@ public class ProjectService {
         return this.projectRepository.save(projectEntity);
     }
 
-    public ProjectEntity patchProject(Long id, ProjectEntity patchedEntity) {
-        ProjectEntity entityToPatch = this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Das Projekt mit der ID " + id + " konnte nicht gefunden werden."));
+    private void validateAddProjectDTO(ProjectEntity projectEntity) {
+        if (projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
+            throw new DateNotValidException("Start date cannot be after planned end date!");
+        }
+        if (!customerService.checkIfCustomerExists(projectEntity.getCustomerId())) {
+            throw new ResourceNotFoundException("Customer not found on id: " + projectEntity.getCustomerId());
+        }
+        if (!employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
+            throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
+        }
+    }
 
+    public ProjectEntity patchProject(Long id, ProjectEntity patchedEntity) {
+        ProjectEntity entityToPatch = this.projectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Das Projekt mit der ID " + id + " konnte nicht gefunden werden."));
+
+        validateEmployeeAndCustomerExistence(patchedEntity);
+
+        updateFields(entityToPatch, patchedEntity);
+        updateDates(entityToPatch, patchedEntity);
+
+        projectRepository.save(entityToPatch);
+        return entityToPatch;
+    }
+
+    private void validateEmployeeAndCustomerExistence(ProjectEntity patchedEntity) {
+        if (patchedEntity.getResponsibleEmployeeId() != 0 && !employeeService.checkIfEmployeeExists(patchedEntity.getResponsibleEmployeeId())) {
+            throw new ResourceNotFoundException("Employee not found on id: " + patchedEntity.getResponsibleEmployeeId());
+        }
+
+        if (patchedEntity.getCustomerId() != 0 && !customerService.checkIfCustomerExists(patchedEntity.getCustomerId())) {
+            throw new ResourceNotFoundException("Customer not found on id: " + patchedEntity.getCustomerId());
+        }
+    }
+
+    private void updateFields(ProjectEntity entityToPatch, ProjectEntity patchedEntity) {
         if (patchedEntity.getTitle() != null) {
             entityToPatch.setTitle(patchedEntity.getTitle());
         }
 
-        if (patchedEntity.getResponsibleEmployeeId() != 0) {
-            if (!employeeService.checkIfEmployeeExists(patchedEntity.getResponsibleEmployeeId())) {
-                throw new ResourceNotFoundException("Employee not found on id: " + patchedEntity.getResponsibleEmployeeId());
-            }
-            entityToPatch.setResponsibleEmployeeId(patchedEntity.getResponsibleEmployeeId());
-        }
+        entityToPatch.setResponsibleEmployeeId(patchedEntity.getResponsibleEmployeeId());
 
-        if (patchedEntity.getCustomerId() != 0){
-            if (!customerService.checkIfCustomerExists(patchedEntity.getCustomerId())) {
-                throw new ResourceNotFoundException("Customer not found on id: " + patchedEntity.getCustomerId());
-            }
-            entityToPatch.setCustomerId(patchedEntity.getCustomerId());
-        }
+        entityToPatch.setCustomerId(patchedEntity.getCustomerId());
 
         if (patchedEntity.getCustomerRepresentativeName() != null) {
             entityToPatch.setCustomerRepresentativeName(patchedEntity.getCustomerRepresentativeName());
@@ -51,7 +74,9 @@ public class ProjectService {
         if (patchedEntity.getGoal() != null) {
             entityToPatch.setGoal(patchedEntity.getGoal());
         }
+    }
 
+    private void updateDates(ProjectEntity entityToPatch, ProjectEntity patchedEntity) {
         if (patchedEntity.getStartDate() != null && patchedEntity.getPlannedEndDate() != null) {
             if (patchedEntity.getStartDate().isAfter(patchedEntity.getPlannedEndDate())) {
                 throw new DateNotValidException("Start date cannot be after planned end date!");
@@ -75,24 +100,9 @@ public class ProjectService {
         }
 
         if (patchedEntity.getActualEndDate() != null) {
-            if (entityToPatch.getActualEndDate() != null && patchedEntity.getActualEndDate().isBefore(entityToPatch.getActualEndDate())){
+            if (entityToPatch.getActualEndDate() != null && patchedEntity.getActualEndDate().isBefore(entityToPatch.getActualEndDate())) {
                 throw new DateNotValidException("Actual end date cannot be before the start date!");
             }
-        }
-
-        projectRepository.save(entityToPatch);
-        return entityToPatch;
-    }
-
-    void validateAddProjectDTO(ProjectEntity projectEntity) {
-        if (projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
-            throw new DateNotValidException("Start date cannot be after planned end date!");
-        }
-        if (!customerService.checkIfCustomerExists(projectEntity.getCustomerId())) {
-            throw new ResourceNotFoundException("Customer not found on id: " + projectEntity.getCustomerId());
-        }
-        if (!employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
-            throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
         }
     }
 }
