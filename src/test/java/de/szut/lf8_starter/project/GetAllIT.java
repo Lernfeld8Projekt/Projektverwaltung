@@ -69,4 +69,13 @@ public class GetAllIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[1].startDate", is("2024-10-09")))
                 .andExpect(jsonPath("$[1].plannedEndDate", is("2028-12-09")));
     }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void noProjectsFound() throws Exception {
+        this.mockMvc.perform(get("/project")
+                .with(csrf()))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
 }

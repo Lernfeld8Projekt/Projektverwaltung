@@ -7,7 +7,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDate;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,5 +48,14 @@ public class GetByIdIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("goal", is("Noch kein")))
                 .andExpect(jsonPath("startDate", is("2025-10-09")))
                 .andExpect(jsonPath("plannedEndDate", is("2028-10-09")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void noProjectByIdFound() throws Exception {
+        this.mockMvc.perform(get("/project/1")
+                        .with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Project not found on id: 1")));
     }
 }

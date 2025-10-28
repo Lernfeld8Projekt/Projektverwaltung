@@ -35,12 +35,10 @@ public class ProjectController implements ProjectControllerOpenAPI {
     @GetMapping
     public ResponseEntity<List<GetProjectDTO>> getAllProjects() {
         List<ProjectEntity> projects = this.projectService.getAllProjects();
-        List<GetProjectDTO> getProjectDTOList = new ArrayList<>();
-        for (ProjectEntity projectEntity : projects) {
-            getProjectDTOList.add(this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity));
-        }
+        List<GetProjectDTO> getProjectDTOList = this.mappingService.mapProjectListToGetProjectDTOList(projects);
         return new ResponseEntity<>(getProjectDTOList, OK);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<GetProjectDTO> getProjectById(@PathVariable Long id) {
