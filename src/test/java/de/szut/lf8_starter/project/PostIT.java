@@ -29,7 +29,7 @@ public class PostIT extends AbstractIntegrationTest {
                 }
                 """;
 
-        final var contentAsString = this.mockMvc.perform(post("/project")
+        this.mockMvc.perform(post("/project")
                         .content(content).contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
@@ -86,5 +86,25 @@ public class PostIT extends AbstractIntegrationTest {
         assertThat(loadedEntity.get().getGoal()).isEqualTo("Project fertig machen");
         assertThat(loadedEntity.get().getStartDate()).isEqualTo("2026-07-07");
         assertThat(loadedEntity.get().getPlannedEndDate()).isEqualTo("2028-01-01");
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void responsibleEmployeeDoesNotExists() throws Exception {
+        final String content = """
+                  {
+                    "title": "BFK",
+                    "responsibleEmployeeId": 102022020202020202,
+                    "customerId": 1,
+                    "customerRepresentativeName": "Max Meyer",
+                    "goal": "Project fertig machen",
+                    "startDate": "2026-07-07",
+                    "plannedEndDate": "2028-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(post("/project").header("Authorization", "Bearer " + GetJWT.getToken()).content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Employee not found on id: 102022020202020202")));
     }
 }
