@@ -1,8 +1,12 @@
 package de.szut.lf8_starter.project;
 
+import de.szut.lf8_starter.customer.CustomerService;
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
@@ -14,6 +18,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class PostIT extends AbstractIntegrationTest {
+
+    @MockBean
+    private CustomerService customerService;
 
     @Test
     void authorization() throws Exception {
@@ -106,5 +113,27 @@ public class PostIT extends AbstractIntegrationTest {
         this.mockMvc.perform(post("/project").header("Authorization", "Bearer " + GetJWT.getToken()).content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is("Employee not found on id: 102022020202020202")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void customerDoesNotExists() throws Exception {
+        Mockito.doReturn(false).when(customerService).checkIfCustomerExists(300L);
+
+        final String content = """
+                  {
+                    "title": "BFK",
+                    "responsibleEmployeeId": 1,
+                    "customerId": 300,
+                    "customerRepresentativeName": "Max Meyer",
+                    "goal": "Project fertig machen",
+                    "startDate": "2026-07-07",
+                    "plannedEndDate": "2028-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(post("/project").header("Authorization", "Bearer " + GetJWT.getToken()).content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Customer not found on id: 300")));
     }
 }
