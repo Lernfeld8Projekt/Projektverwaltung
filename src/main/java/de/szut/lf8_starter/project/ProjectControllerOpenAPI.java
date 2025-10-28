@@ -29,11 +29,13 @@ public interface ProjectControllerOpenAPI {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Project Deleted",
                     content = @Content),
-            @ApiResponse(responseCode = "400", description = "invalid JSON posted",
+            @ApiResponse(responseCode = "400", description = "Invalid JSON posted",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Not Authorized",
                     content = @Content),
             @ApiResponse(responseCode = "404", description = "ID not found",
                     content = @Content),
-    @ApiResponse(responseCode = "500", description = "Invalid JSON posted",
-            content = @Content)})
+            @ApiResponse(responseCode = "500", description = "Invalid JSON posted",
+                    content = @Content)})
     ResponseEntity<Void> deleteProject(Long id);
 }

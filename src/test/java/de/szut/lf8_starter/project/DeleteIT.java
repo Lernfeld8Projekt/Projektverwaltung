@@ -15,7 +15,6 @@ public class DeleteIT extends AbstractIntegrationTest {
 
     @Test
     void authorization() throws Exception {
-
         this.mockMvc.perform(delete("/project/{id}", 1)
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
@@ -23,7 +22,6 @@ public class DeleteIT extends AbstractIntegrationTest {
 
     @Test
     void projectExists() throws Exception{
-
         var projectEntity = new ProjectEntity();
         projectEntity.setTitle("BFK");
         projectEntity.setResponsibleEmployeeId(1L);
@@ -35,16 +33,13 @@ public class DeleteIT extends AbstractIntegrationTest {
         projectRepository.save(projectEntity);
 
         this.mockMvc.perform(delete("/project/{id}", 1)
-                        .header("Authorization", "Bearer " + GetJWT.getToken())
                         .with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void projectDoesNotExist() throws Exception{
-
         this.mockMvc.perform(delete("/project/{id}", 1)
-                        .header("Authorization", "Bearer " + GetJWT.getToken())
                         .with(csrf()))
                 .andExpect(status().isNotFound());
     }
