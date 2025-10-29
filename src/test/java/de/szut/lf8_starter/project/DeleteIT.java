@@ -3,6 +3,7 @@ package de.szut.lf8_starter.project;
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDate;
 
@@ -21,6 +22,7 @@ public class DeleteIT extends AbstractIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = "user")
     void projectExists() throws Exception{
         var projectEntity = new ProjectEntity();
         projectEntity.setTitle("BFK");
@@ -38,6 +40,7 @@ public class DeleteIT extends AbstractIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = "user")
     void projectDoesNotExist() throws Exception{
         this.mockMvc.perform(delete("/project/{id}", 1)
                         .with(csrf()))

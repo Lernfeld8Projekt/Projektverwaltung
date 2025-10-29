@@ -2,9 +2,13 @@ package de.szut.lf8_starter.mapper;
 
 import de.szut.lf8_starter.project.DTO.AddProjectDTO;
 import de.szut.lf8_starter.project.DTO.GetProjectDTO;
+import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
 import de.szut.lf8_starter.project.ProjectEntity;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +38,29 @@ public class MappingService {
         getProjectDTO.setPlannedEndDate(projectEntity.getPlannedEndDate());
         getProjectDTO.setActualEndDate(projectEntity.getActualEndDate());
         return getProjectDTO;
+    }
+
+    public Map<String,Object> mapPatchProjectDTOtoMapWithFields(PatchProjectDTO patchProjectDTO) {
+        Map<String, Object> fields = new HashMap<>();
+
+        if (patchProjectDTO == null) {
+            return fields;
+        }
+
+        for (Field field : patchProjectDTO.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+
+            try {
+                Object value = field.get(patchProjectDTO);
+                if (value != null) {
+                    fields.put(field.getName(), value);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Could not access fields!");
+            }
+        }
+
+        return fields;
     }
 
     public List<GetProjectDTO> mapProjectListToGetProjectDTOList(List<ProjectEntity> projects) {
