@@ -1,10 +1,16 @@
 package de.szut.lf8_starter.project;
 
+import de.szut.lf8_starter.customer.CustomerService;
+import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -14,6 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class PostIT extends AbstractIntegrationTest {
+    @MockBean
+    private EmployeeService employeeService;
+    @MockBean
+    private CustomerService customerService;
 
     @Test
     void authorization() throws Exception {
@@ -29,7 +39,7 @@ public class PostIT extends AbstractIntegrationTest {
                 }
                 """;
 
-        final var contentAsString = this.mockMvc.perform(post("/project")
+        this.mockMvc.perform(post("/project")
                         .content(content).contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
@@ -38,7 +48,8 @@ public class PostIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(roles = "user")
     void storeAndFind() throws Exception {
-
+        Mockito.doReturn(true).when(customerService).checkIfCustomerExists(1L);
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
         //Body erstellen als String
         final String content = """
                   {
@@ -52,9 +63,9 @@ public class PostIT extends AbstractIntegrationTest {
                 }
                 """;
 
-
         //Body posten und überprüfen ob der JSON richtig formatiert ist
-        final var contentAsString = this.mockMvc.perform(post("/project").header("Authorization", "Bearer " + GetJWT.getToken()).content(content).contentType(MediaType.APPLICATION_JSON)
+        final var contentAsString = this.mockMvc.perform(post("/project")
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("id").exists())
@@ -68,7 +79,6 @@ public class PostIT extends AbstractIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-
 
         //ID aus String rausziehen
         final var id = Long.parseLong(new JSONObject(contentAsString).get("id").toString());
@@ -86,5 +96,80 @@ public class PostIT extends AbstractIntegrationTest {
         assertThat(loadedEntity.get().getGoal()).isEqualTo("Project fertig machen");
         assertThat(loadedEntity.get().getStartDate()).isEqualTo("2026-07-07");
         assertThat(loadedEntity.get().getPlannedEndDate()).isEqualTo("2028-01-01");
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void responsibleEmployeeDoesNotExists() throws Exception {
+        Mockito.doReturn(true).when(customerService).checkIfCustomerExists(1L);
+        Mockito.doReturn(false).when(employeeService).checkIfEmployeeExists(1L);
+
+        final String content = """
+                  {
+                    "title": "BFK",
+                    "responsibleEmployeeId": 1,
+                    "customerId": 1,
+                    "customerRepresentativeName": "Max Meyer",
+                    "goal": "Project fertig machen",
+                    "startDate": "2026-07-07",
+                    "plannedEndDate": "2028-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(post("/project")
+                        .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Employee not found on id: 1")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void customerDoesNotExists() throws Exception {
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
+        Mockito.doReturn(false).when(customerService).checkIfCustomerExists(1L);
+
+        final String content = """
+                  {
+                    "title": "BFK",
+                    "responsibleEmployeeId": 1,
+                    "customerId": 1,
+                    "customerRepresentativeName": "Max Meyer",
+                    "goal": "Project fertig machen",
+                    "startDate": "2026-07-07",
+                    "plannedEndDate": "2028-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(post("/project")
+                        .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Customer not found on id: 1")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void whenStartDateIsAfterPlannedEndDate() throws Exception {
+        var projectEntity = new ProjectEntity();
+        projectEntity.setTitle("BFK");
+        projectEntity.setResponsibleEmployeeId(1L);
+        projectEntity.setCustomerId(1L);
+        projectEntity.setCustomerRepresentativeName("Max Meyer");
+        projectEntity.setGoal("Project fertig machen");
+        projectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        projectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+        projectRepository.save(projectEntity);
+
+        final String content = """
+                  {
+                    "startDate": "2027-01-01",
+                    "plannedEndDate": "2026-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(
+                        post("/project")
+                                .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Start date cannot be after planned end date!")));
     }
 }
