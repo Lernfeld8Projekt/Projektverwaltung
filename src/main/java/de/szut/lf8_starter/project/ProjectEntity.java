@@ -31,11 +31,7 @@ public class ProjectEntity {
 
     private LocalDate actualEndDate = null;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "project_employee_ids",
-            joinColumns = @JoinColumn(name = "project_id")
-    )
-    @Column(name = "employee_id")
-    private Set<Long> employees = new HashSet<>();
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private Set<ProjectAssignment> assignments = new HashSet<>();
+
 }

@@ -63,6 +63,7 @@ public class ProjectService {
         if (projectEntity.getCustomerId() != null && !customerService.checkIfCustomerExists(projectEntity.getCustomerId())) {
             throw new ResourceNotFoundException("Customer not found on id: " + projectEntity.getCustomerId());
         }
+
         if (projectEntity.getResponsibleEmployeeId() != null && !employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
             throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
         }
@@ -72,5 +73,9 @@ public class ProjectService {
         ProjectEntity projectEntity = this.projectRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Project with ID " + id + " not found."));
         this.projectRepository.delete(projectEntity);
+    }
+
+    public void addEmployeeToProject(final Long projectId) {
+
     }
 }
