@@ -37,8 +37,8 @@ public class MappingService {
     public ProjectEntity mapPatchProjectDTOtoProjectEntity(PatchProjectDTO patchProjectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setTitle(patchProjectDTO.getTitle());
-        projectEntity.setResponsibleEmployeeId(patchProjectDTO.getResponsibleEmployeeId() == null ? 0 : patchProjectDTO.getResponsibleEmployeeId());
-        projectEntity.setCustomerId(patchProjectDTO.getCustomerId() == null ? 0 : patchProjectDTO.getCustomerId());
+        projectEntity.setResponsibleEmployeeId(patchProjectDTO.getResponsibleEmployeeId());
+        projectEntity.setCustomerId(patchProjectDTO.getCustomerId());
         projectEntity.setCustomerRepresentativeName(patchProjectDTO.getCustomerRepresentativeName());
         projectEntity.setGoal(patchProjectDTO.getGoal());
         projectEntity.setStartDate(patchProjectDTO.getStartDate());

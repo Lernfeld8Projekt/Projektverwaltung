@@ -30,7 +30,7 @@ public class ProjectController implements ProjectControllerOpenAPI{
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<GetProjectDTO> updateProject(@PathVariable Long id, @Valid @RequestBody PatchProjectDTO patchProjectDTO) {
+    public ResponseEntity<GetProjectDTO> updateProject(@PathVariable Long id, @RequestBody PatchProjectDTO patchProjectDTO) {
         ProjectEntity projectEntity = this.mappingService.mapPatchProjectDTOtoProjectEntity(patchProjectDTO);
         projectEntity = this.projectService.patchProject(id, projectEntity);
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
