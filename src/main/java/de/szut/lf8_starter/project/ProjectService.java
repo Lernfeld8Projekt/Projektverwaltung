@@ -29,6 +29,14 @@ public class ProjectService {
         return this.projectRepository.save(projectEntity);
     }
 
+    public List<ProjectEntity> getAllProjects() {
+        return this.projectRepository.findAll();
+    }
+
+    public ProjectEntity getProjectById(Long id) {
+        return this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
+    }
+
     public ProjectEntity patchProject(Long id, Map<String,Object> fields) {
         ProjectEntity entityToPatch = this.projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
@@ -43,19 +51,8 @@ public class ProjectService {
 
         return projectRepository.save(entityToPatch);
     }
-
     private void validateProjectEntity(ProjectEntity projectEntity) {
         if (projectEntity.getStartDate() != null && projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
-    public List<ProjectEntity> getAllProjects() {
-        return this.projectRepository.findAll();
-    }
-
-    public ProjectEntity getProjectById(Long id) {
-        return this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
-    }
-
-    void validateAddProjectDTO(ProjectEntity projectEntity) {
-        if (projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
             throw new DateNotValidException("Start date cannot be after planned end date!");
         }
 

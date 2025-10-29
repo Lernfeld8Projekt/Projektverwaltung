@@ -41,7 +41,7 @@ public class MappingService {
     }
 
     public Map<String,Object> mapPatchProjectDTOtoMapWithFields(PatchProjectDTO patchProjectDTO) {
-        Map<String,Object> fields = new HashMap<>();
+        Map<String, Object> fields = new HashMap<>();
 
         if (patchProjectDTO == null) {
             return fields;
@@ -61,6 +61,8 @@ public class MappingService {
         }
 
         return fields;
+    }
+
     public List<GetProjectDTO> mapProjectListToGetProjectDTOList(List<ProjectEntity> projects) {
         List<GetProjectDTO> getProjectDTOList = new ArrayList<>();
         for (ProjectEntity projectEntity : projects) {

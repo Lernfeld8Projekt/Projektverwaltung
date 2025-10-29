@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Map;
 import java.util.List;
 
 public interface ProjectControllerOpenAPI {
@@ -42,6 +41,7 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "Project, Employee or Customer not found",
                     content = @Content),
     })
+
     ResponseEntity<GetProjectDTO> updateProject(Long id, PatchProjectDTO patchProjectDTO);
     @Operation(summary = "Delete a project with its ID.")
     @ApiResponses(value = {
@@ -56,6 +56,7 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "500", description = "Invalid JSON posted",
                     content = @Content)})
     ResponseEntity<Void> deleteProject(Long id);
+
     @Operation(summary = "delivers a list of project objects")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of projects",
