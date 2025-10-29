@@ -10,6 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -142,5 +144,32 @@ public class PostIT extends AbstractIntegrationTest {
                         .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is("Customer not found on id: 1")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void whenStartDateIsAfterPlannedEndDate() throws Exception {
+        var projectEntity = new ProjectEntity();
+        projectEntity.setTitle("BFK");
+        projectEntity.setResponsibleEmployeeId(1L);
+        projectEntity.setCustomerId(1L);
+        projectEntity.setCustomerRepresentativeName("Max Meyer");
+        projectEntity.setGoal("Project fertig machen");
+        projectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        projectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+        projectRepository.save(projectEntity);
+
+        final String content = """
+                  {
+                    "startDate": "2027-01-01",
+                    "plannedEndDate": "2026-01-01"
+                }
+                """;
+
+        this.mockMvc.perform(
+                        post("/project")
+                                .content(content).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Start date cannot be after planned end date!")));
     }
 }
