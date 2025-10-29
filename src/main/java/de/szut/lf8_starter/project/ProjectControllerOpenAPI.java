@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Map;
+
 public interface ProjectControllerOpenAPI {
     @Operation(summary = "creates a new project with it's id, title," +
             " responsible employee id, customer id, customer representative name," +
@@ -41,5 +43,5 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "Project, Employee or Customer not found",
                     content = @Content),
     })
-    ResponseEntity<GetProjectDTO> updateProject(Long id,PatchProjectDTO patchProjectDTO);
+    ResponseEntity<GetProjectDTO> updateProject(Long id, PatchProjectDTO patchProjectDTO);
 }

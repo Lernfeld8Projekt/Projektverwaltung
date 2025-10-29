@@ -5,6 +5,10 @@ import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 @Service
 public class ProjectService {
@@ -23,49 +27,19 @@ public class ProjectService {
         return this.projectRepository.save(projectEntity);
     }
 
-    public ProjectEntity patchProject(Long id, ProjectEntity patchedEntity) {
+    public ProjectEntity patchProject(Long id, Map<String,Object> fields) {
         ProjectEntity entityToPatch = this.projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
 
-        validateProjectEntity(patchedEntity);
+        fields.forEach((key, value) -> {
+            Field field = ReflectionUtils.findField(ProjectEntity.class, key);
+            field.setAccessible(true);
+            ReflectionUtils.setField(field, entityToPatch, value);
+        });
 
-        updateFields(entityToPatch, patchedEntity);
+        validateProjectEntity(entityToPatch);
 
         return projectRepository.save(entityToPatch);
-    }
-
-    private void updateFields(ProjectEntity entityToPatch, ProjectEntity patchedEntity) {
-        if (patchedEntity.getTitle() != null) {
-            entityToPatch.setTitle(patchedEntity.getTitle());
-        }
-
-        if (patchedEntity.getResponsibleEmployeeId() != null) {
-            entityToPatch.setResponsibleEmployeeId(patchedEntity.getResponsibleEmployeeId());
-        }
-
-        if (patchedEntity.getCustomerId() != null) {
-            entityToPatch.setCustomerId(patchedEntity.getCustomerId());
-        }
-
-        if (patchedEntity.getCustomerRepresentativeName() != null) {
-            entityToPatch.setCustomerRepresentativeName(patchedEntity.getCustomerRepresentativeName());
-        }
-
-        if (patchedEntity.getGoal() != null) {
-            entityToPatch.setGoal(patchedEntity.getGoal());
-        }
-
-        if (patchedEntity.getStartDate() != null) {
-            entityToPatch.setStartDate(patchedEntity.getStartDate());
-        }
-
-        if (patchedEntity.getPlannedEndDate() != null) {
-            entityToPatch.setPlannedEndDate(patchedEntity.getPlannedEndDate());
-        }
-
-        if (patchedEntity.getActualEndDate() != null) {
-            entityToPatch.setActualEndDate(patchedEntity.getActualEndDate());
-        }
     }
 
     private void validateProjectEntity(ProjectEntity projectEntity) {

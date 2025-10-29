@@ -6,6 +6,10 @@ import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
 import de.szut.lf8_starter.project.ProjectEntity;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class MappingService {
     public ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO){
@@ -34,16 +38,26 @@ public class MappingService {
         return getProjectDTO;
     }
 
-    public ProjectEntity mapPatchProjectDTOtoProjectEntity(PatchProjectDTO patchProjectDTO) {
-        ProjectEntity projectEntity = new ProjectEntity();
-        projectEntity.setTitle(patchProjectDTO.getTitle());
-        projectEntity.setResponsibleEmployeeId(patchProjectDTO.getResponsibleEmployeeId());
-        projectEntity.setCustomerId(patchProjectDTO.getCustomerId());
-        projectEntity.setCustomerRepresentativeName(patchProjectDTO.getCustomerRepresentativeName());
-        projectEntity.setGoal(patchProjectDTO.getGoal());
-        projectEntity.setStartDate(patchProjectDTO.getStartDate());
-        projectEntity.setPlannedEndDate(patchProjectDTO.getPlannedEndDate());
-        projectEntity.setActualEndDate(patchProjectDTO.getActualEndDate());
-        return projectEntity;
+    public Map<String,Object> mapPatchProjectDTOtoMapWithFields(PatchProjectDTO patchProjectDTO) {
+        Map<String,Object> fields = new HashMap<>();
+
+        if (patchProjectDTO == null) {
+            return fields;
+        }
+
+        for (Field field : patchProjectDTO.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+
+            try {
+                Object value = field.get(patchProjectDTO);
+                if (value != null) {
+                    fields.put(field.getName(), value);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Could not access fields!");
+            }
+        }
+
+        return fields;
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/project")
 public class ProjectController implements ProjectControllerOpenAPI{
@@ -31,8 +33,8 @@ public class ProjectController implements ProjectControllerOpenAPI{
 
     @PatchMapping("/{id}")
     public ResponseEntity<GetProjectDTO> updateProject(@PathVariable Long id, @RequestBody PatchProjectDTO patchProjectDTO) {
-        ProjectEntity projectEntity = this.mappingService.mapPatchProjectDTOtoProjectEntity(patchProjectDTO);
-        projectEntity = this.projectService.patchProject(id, projectEntity);
+        Map<String,Object> fields = this.mappingService.mapPatchProjectDTOtoMapWithFields(patchProjectDTO);
+        ProjectEntity projectEntity = this.projectService.patchProject(id, fields);
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
         return new ResponseEntity<>(projectDTO, HttpStatus.OK);
     }
