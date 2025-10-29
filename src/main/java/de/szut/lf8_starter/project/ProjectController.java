@@ -28,7 +28,7 @@ public class ProjectController implements ProjectControllerOpenAPI {
     }
 
     @PostMapping
-    public ResponseEntity<GetProjectDTO> createProject(@Valid @RequestBody AddProjectDTO addProjectDTO) {
+    public ResponseEntity<GetProjectDTO> createProject(@Valid @RequestBody final AddProjectDTO addProjectDTO) {
         ProjectEntity projectEntity = this.mappingService.mapAddProjectDTOtoProjectEntity(addProjectDTO);
         projectEntity = this.projectService.createProject(projectEntity);
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
