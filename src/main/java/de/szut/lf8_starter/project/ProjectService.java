@@ -10,6 +10,8 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import java.util.List;
+
 @Service
 public class ProjectService {
     private final CustomerService customerService;
@@ -44,6 +46,16 @@ public class ProjectService {
 
     private void validateProjectEntity(ProjectEntity projectEntity) {
         if (projectEntity.getStartDate() != null && projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
+    public List<ProjectEntity> getAllProjects() {
+        return this.projectRepository.findAll();
+    }
+
+    public ProjectEntity getProjectById(Long id) {
+        return this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
+    }
+
+    void validateAddProjectDTO(ProjectEntity projectEntity) {
+        if (projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
             throw new DateNotValidException("Start date cannot be after planned end date!");
         }
 
@@ -57,5 +69,11 @@ public class ProjectService {
         if (projectEntity.getResponsibleEmployeeId() != null && !employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
             throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
         }
+    }
+
+    public void deleteProjectById(final Long id) {
+        ProjectEntity projectEntity = this.projectRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Project with ID " + id + " not found."));
+        this.projectRepository.delete(projectEntity);
     }
 }

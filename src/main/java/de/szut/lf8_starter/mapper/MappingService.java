@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MappingService {
@@ -59,5 +61,11 @@ public class MappingService {
         }
 
         return fields;
+    public List<GetProjectDTO> mapProjectListToGetProjectDTOList(List<ProjectEntity> projects) {
+        List<GetProjectDTO> getProjectDTOList = new ArrayList<>();
+        for (ProjectEntity projectEntity : projects) {
+            getProjectDTOList.add(this.mapProjectEntityToGetProjectDTO(projectEntity));
+        }
+        return getProjectDTOList;
     }
 }
