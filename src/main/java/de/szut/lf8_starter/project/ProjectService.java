@@ -69,7 +69,7 @@ public class ProjectService {
     }
 
     private void validateProjectEntity(ProjectEntity projectEntity) {
-        if (projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
+        if (projectEntity.getStartDate() != null && projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
             throw new DateNotValidException("Start date cannot be after planned end date!");
         }
 
@@ -77,10 +77,10 @@ public class ProjectService {
             throw new DateNotValidException("Actual end date cannot be before start date!");
         }
 
-        if (!customerService.checkIfCustomerExists(projectEntity.getCustomerId())) {
+        if (projectEntity.getCustomerId() != null && !customerService.checkIfCustomerExists(projectEntity.getCustomerId())) {
             throw new ResourceNotFoundException("Customer not found on id: " + projectEntity.getCustomerId());
         }
-        if (!employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
+        if (projectEntity.getResponsibleEmployeeId() != null && !employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
             throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
         }
     }
