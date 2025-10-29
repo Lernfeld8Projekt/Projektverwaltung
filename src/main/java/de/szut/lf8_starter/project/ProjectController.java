@@ -6,7 +6,6 @@ import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,5 +44,11 @@ public class ProjectController implements ProjectControllerOpenAPI {
         ProjectEntity project = this.projectService.getProjectById(id);
         GetProjectDTO getProjectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(project);
         return new ResponseEntity<>(getProjectDTO, OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id){
+        projectService.deleteProjectById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
