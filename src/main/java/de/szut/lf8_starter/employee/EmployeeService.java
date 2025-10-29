@@ -3,6 +3,7 @@ package de.szut.lf8_starter.employee;
 import de.szut.lf8_starter.security.AuthenticationService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
@@ -26,12 +27,13 @@ public class EmployeeService {
         HttpEntity<Void> entity = getHttpEntityWithToken();
         String url = this.url + "/" + id;
 
-        ResponseEntity<String> response = this.restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        try {
+            ResponseEntity<String> response = this.restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return true;
+            return response.getStatusCode() == HttpStatus.OK;
+
+        }catch (HttpClientErrorException.NotFound exception) {
+            return false;
         }
-
-        return false;
     }
 }
