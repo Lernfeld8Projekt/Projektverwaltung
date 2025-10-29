@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Map;
 
 public interface ProjectControllerOpenAPI {
-    @Operation(summary = "creates a new project with it's id, title," +
+    @Operation(summary = "creates a new project with its id, title," +
             " responsible employee id, customer id, customer representative name," +
             " goal, start date, planned end date and actual end date")
     @ApiResponses(value = {
@@ -29,7 +29,7 @@ public interface ProjectControllerOpenAPI {
     })
     ResponseEntity<GetProjectDTO> createProject(AddProjectDTO addProjectDTO);
 
-    @Operation(summary = "patches an existing project by it's id with it's title," +
+    @Operation(summary = "patches an existing project by its id with its title," +
             " responsible employee id, customer id, customer representative name," +
             " goal, start date, planned end date and actual end date")
     @ApiResponses(value = {

@@ -35,7 +35,6 @@ public class PatchIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(roles = "user")
     void projectDoesNotExists() throws Exception {
-
         final String content = """
                   {
                     "title": "Miau",
@@ -192,7 +191,7 @@ public class PatchIT extends AbstractIntegrationTest {
 
     @Test
     @WithMockUser(roles = "user")
-    void whenStartDateIsAfterPlannedEndDateAndPlannedEndDateIsBeforeStartDate() throws Exception {
+    void whenStartDateIsAfterPlannedEndDate() throws Exception {
         var projectEntity = new ProjectEntity();
         projectEntity.setTitle("BFK");
         projectEntity.setResponsibleEmployeeId(1L);
@@ -220,7 +219,7 @@ public class PatchIT extends AbstractIntegrationTest {
 
     @Test
     @WithMockUser(roles = "user")
-    void whenActualEndDateIsBeforeStartDateOrStartDateIsAfterActualEndDate() throws Exception {
+    void whenActualEndDateIsBeforeStartDate() throws Exception {
         var projectEntity = new ProjectEntity();
         projectEntity.setTitle("BFK");
         projectEntity.setResponsibleEmployeeId(1L);
