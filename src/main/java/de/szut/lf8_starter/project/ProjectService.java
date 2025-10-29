@@ -6,6 +6,8 @@ import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProjectService {
     private final CustomerService customerService;
@@ -23,6 +25,14 @@ public class ProjectService {
         return this.projectRepository.save(projectEntity);
     }
 
+    public List<ProjectEntity> getAllProjects() {
+        return this.projectRepository.findAll();
+    }
+
+    public ProjectEntity getProjectById(Long id) {
+        return this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
+    }
+
     void validateAddProjectDTO(ProjectEntity projectEntity) {
         if (projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
             throw new DateNotValidException("Start date cannot be after planned end date!");
@@ -33,5 +43,11 @@ public class ProjectService {
         if (!employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
             throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
         }
+    }
+
+    public void deleteProjectById(final Long id) {
+        ProjectEntity projectEntity = this.projectRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Project with ID " + id + " not found."));
+        this.projectRepository.delete(projectEntity);
     }
 }

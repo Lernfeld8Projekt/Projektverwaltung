@@ -5,6 +5,9 @@ import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import de.szut.lf8_starter.project.ProjectEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class MappingService {
     public ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO){
@@ -31,5 +34,13 @@ public class MappingService {
         getProjectDTO.setPlannedEndDate(projectEntity.getPlannedEndDate());
         getProjectDTO.setActualEndDate(projectEntity.getActualEndDate());
         return getProjectDTO;
+    }
+
+    public List<GetProjectDTO> mapProjectListToGetProjectDTOList(List<ProjectEntity> projects) {
+        List<GetProjectDTO> getProjectDTOList = new ArrayList<>();
+        for (ProjectEntity projectEntity : projects) {
+            getProjectDTOList.add(this.mapProjectEntityToGetProjectDTO(projectEntity));
+        }
+        return getProjectDTOList;
     }
 }
