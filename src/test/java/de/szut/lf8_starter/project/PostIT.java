@@ -118,13 +118,13 @@ public class PostIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(roles = "user")
     void customerDoesNotExists() throws Exception {
-        Mockito.doReturn(false).when(customerService).checkIfCustomerExists(300L);
+        Mockito.doReturn(false).when(customerService).checkIfCustomerExists(10000000L);
 
         final String content = """
                   {
                     "title": "BFK",
                     "responsibleEmployeeId": 1,
-                    "customerId": 300,
+                    "customerId": 10000000,
                     "customerRepresentativeName": "Max Meyer",
                     "goal": "Project fertig machen",
                     "startDate": "2026-07-07",
