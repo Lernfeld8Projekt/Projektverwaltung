@@ -1,9 +1,12 @@
 package de.szut.lf8_starter.mapper;
 
+import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.project.DTO.AddProjectDTO;
+import de.szut.lf8_starter.project.DTO.GetEmployeeProjectsDTO;
 import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
 import de.szut.lf8_starter.project.ProjectEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -14,7 +17,7 @@ import java.util.List;
 
 @Service
 public class MappingService {
-    public ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO){
+    public ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setTitle(addProjectDTO.getTitle());
         projectEntity.setResponsibleEmployeeId(addProjectDTO.getResponsibleEmployeeId());
@@ -26,7 +29,7 @@ public class MappingService {
         return projectEntity;
     }
 
-    public GetProjectDTO mapProjectEntityToGetProjectDTO(ProjectEntity projectEntity){
+    public GetProjectDTO mapProjectEntityToGetProjectDTO(ProjectEntity projectEntity) {
         GetProjectDTO getProjectDTO = new GetProjectDTO();
         getProjectDTO.setId(projectEntity.getId());
         getProjectDTO.setTitle(projectEntity.getTitle());
@@ -40,7 +43,7 @@ public class MappingService {
         return getProjectDTO;
     }
 
-    public Map<String,Object> mapPatchProjectDTOtoMapWithFields(PatchProjectDTO patchProjectDTO) {
+    public Map<String, Object> mapPatchProjectDTOtoMapWithFields(PatchProjectDTO patchProjectDTO) {
         Map<String, Object> fields = new HashMap<>();
 
         if (patchProjectDTO == null) {
@@ -69,5 +72,33 @@ public class MappingService {
             getProjectDTOList.add(this.mapProjectEntityToGetProjectDTO(projectEntity));
         }
         return getProjectDTOList;
+    }
+
+    //    public GetEmployeeProjectsDTO mapEmployeeProjects(Long employeeId, Map<String, Object> employeeData, List<GetProjectDTO> projectDTOs) {
+//
+//        GetEmployeeProjectsDTO response = new GetEmployeeProjectsDTO();
+//        response.setEmployeeId(employeeId);
+//        response.setEmployeeName(firstName + " " + lastName);
+//        response.setSkillSet(skills);
+//        response.setProjects(projectDTOs);
+//        return response;
+//    }
+    public GetEmployeeProjectsDTO mapEmployeeProjects(Long employeeId, Map<String, Object> employeeData, List<GetProjectDTO> projectDTOs) {
+        String firstName = (String) employeeData.get("firstName");
+        String lastName = (String) employeeData.get("lastName");
+
+        List<Map<String, Object>> skillMaps =
+                (List<Map<String, Object>>) employeeData.get("skillSet");
+
+        List<String> skills = skillMaps.stream()
+                .map(skill -> (String) skill.get("skill"))
+                .toList();
+
+        GetEmployeeProjectsDTO response = new GetEmployeeProjectsDTO();
+        response.setEmployeeId(employeeId);
+        response.setEmployeeName(firstName + " " + lastName);
+        response.setSkillSet(skills);
+        response.setProjects(projectDTOs);
+        return response;
     }
 }

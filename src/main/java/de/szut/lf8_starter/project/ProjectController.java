@@ -1,5 +1,7 @@
 package de.szut.lf8_starter.project;
 
+import de.szut.lf8_starter.employee.EmployeeService;
+import de.szut.lf8_starter.project.DTO.GetEmployeeProjectsDTO;
 import de.szut.lf8_starter.mapper.MappingService;
 import de.szut.lf8_starter.project.DTO.AddProjectDTO;
 import de.szut.lf8_starter.project.DTO.GetProjectDTO;
@@ -10,11 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/project")
@@ -25,6 +27,7 @@ public class ProjectController implements ProjectControllerOpenAPI {
     public ProjectController(MappingService mappingService, ProjectService projectService) {
         this.mappingService = mappingService;
         this.projectService = projectService;
+
     }
 
     @PostMapping
@@ -62,5 +65,18 @@ public class ProjectController implements ProjectControllerOpenAPI {
         ProjectEntity projectEntity = this.projectService.patchProject(id, fields);
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
         return new ResponseEntity<>(projectDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/employee/{employeeId}")
+    public ResponseEntity<GetEmployeeProjectsDTO> getProjectsByEmployeeId(@PathVariable Long employeeId) {
+
+        Map<String, Object> employeeData = projectService.getEmployeeService().getEmployeeById(employeeId);
+
+        List<ProjectEntity> projects = projectService.getProjectsByEmployeeId(employeeId);
+        List<GetProjectDTO> projectDTOs = mappingService.mapProjectListToGetProjectDTOList(projects);
+
+        GetEmployeeProjectsDTO response = mappingService.mapEmployeeProjects(employeeId, employeeData, projectDTOs);
+
+        return ResponseEntity.ok(response);
     }
 }
