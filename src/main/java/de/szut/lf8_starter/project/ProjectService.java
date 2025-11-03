@@ -3,6 +3,7 @@ package de.szut.lf8_starter.project;
 import de.szut.lf8_starter.customer.CustomerService;
 import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
+import de.szut.lf8_starter.exceptionHandling.EmployeeAlreadyInThisProject;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -11,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProjectService {
@@ -63,6 +65,7 @@ public class ProjectService {
         if (projectEntity.getCustomerId() != null && !customerService.checkIfCustomerExists(projectEntity.getCustomerId())) {
             throw new ResourceNotFoundException("Customer not found on id: " + projectEntity.getCustomerId());
         }
+
         if (projectEntity.getResponsibleEmployeeId() != null && !employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
             throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
         }
@@ -72,6 +75,31 @@ public class ProjectService {
         ProjectEntity projectEntity = this.projectRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Project with ID " + id + " not found."));
         this.projectRepository.delete(projectEntity);
+    }
+
+    public void addEmployeeToProject(final Long projectId, ProjectAssignment newProjectAssignment) {
+        ProjectEntity project = this.projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found on ID: " + projectId));
+
+
+        Set<ProjectAssignment> oldProjectAssignments = project.getAssignments();
+
+        checkIfEmployeeIsAlreadyInProject(oldProjectAssignments, newProjectAssignment);
+        this.employeeService.checkIfEmployeeExists(newProjectAssignment.getEmployeeId());
+        this.employeeService.checkIfEmployeeHaveQualification(newProjectAssignment.getEmployeeId(), newProjectAssignment.getQualificationId());
+
+        oldProjectAssignments.add(newProjectAssignment);
+        project.setAssignments(oldProjectAssignments);
+
+        this.projectRepository.save(project);
+    }
+
+    public void checkIfEmployeeIsAlreadyInProject(Set<ProjectAssignment> oldProjectAssignments, ProjectAssignment newProjectAssignment) {
+        for (ProjectAssignment oldProjectAssignment : oldProjectAssignments) {
+            if (oldProjectAssignment.getEmployeeId() == newProjectAssignment.getEmployeeId()) {
+                throw new EmployeeAlreadyInThisProject("The Employee with ID " + newProjectAssignment.getEmployeeId() +  " is already a part of the project!");
+            }
+        }
     }
 
     public List<ProjectEntity> getProjectsByEmployeeId(Long employeeId) {
@@ -84,5 +112,4 @@ public class ProjectService {
     public EmployeeService getEmployeeService() {
         return this.employeeService;
     }
-
 }

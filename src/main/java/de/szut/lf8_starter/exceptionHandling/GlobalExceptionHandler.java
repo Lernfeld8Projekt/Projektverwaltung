@@ -12,8 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Date;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,6 +32,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleDateNotValidException(DateNotValidException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmployeeAlreadyInThisProject.class)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "409", description = "Employee is already in this project",
+                    content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+    })
+    public ResponseEntity<?> handleEmployeeAlreadyInThisProjectException(EmployeeAlreadyInThisProject ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, CONFLICT);
     }
 
     @ApiResponse(responseCode = "500", description = "invalid JSON posted",
