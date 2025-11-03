@@ -73,4 +73,16 @@ public class ProjectService {
                 new ResourceNotFoundException("Project with ID " + id + " not found."));
         this.projectRepository.delete(projectEntity);
     }
+
+    public void removeEmployeeFromProject(Long projectId, Long employeeId) {
+        ProjectEntity project = this.projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + projectId));
+
+        if (employeeService.checkIfEmployeeExists(employeeId)) {
+            throw new ResourceNotFoundException("Employee not found on id: " +employeeId);
+        }
+
+        //schauen ob mitarbeiter im Projekt ist
+        //project remove employee
+    }
 }
