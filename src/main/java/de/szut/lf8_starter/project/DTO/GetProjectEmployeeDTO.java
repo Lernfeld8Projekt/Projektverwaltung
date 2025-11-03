@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class GetProjectEmployeeDTO {
     private Long projectId;
-//    private String title;
+    private String title;
     private Long employeeId;
     private String employeeLastName;
     private String employeeFirstName;

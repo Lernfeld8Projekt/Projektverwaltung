@@ -3,13 +3,12 @@ package de.szut.lf8_starter.project;
 import de.szut.lf8_starter.customer.CustomerService;
 import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
+import de.szut.lf8_starter.exceptionHandling.EmployeeAlreadyInThisProject;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
-import javax.sound.sampled.Port;
 import java.lang.reflect.Field;
-import java.util.HashSet;
 import java.util.Map;
 
 import java.util.List;
@@ -78,17 +77,28 @@ public class ProjectService {
         this.projectRepository.delete(projectEntity);
     }
 
-    public void addEmployeeToProject(final Long projectId, ProjectAssignment projectAssignment) {
+    public void addEmployeeToProject(final Long projectId, ProjectAssignment newProjectAssignment) {
         ProjectEntity project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found on ID: " + projectId));
 
-        Set<ProjectAssignment> projectAssignments = project.getAssignments();
-        projectAssignments.add(projectAssignment);
-        project.setAssignments(projectAssignments);
 
-        this.employeeService.checkIfEmployeeExists(projectAssignment.getEmployeeId());
-        this.employeeService.checkIfEmployeeHaveQualification(projectAssignment.getEmployeeId(), projectAssignment.getQualificationId());
+        Set<ProjectAssignment> oldProjectAssignments = project.getAssignments();
+
+        checkIfEmployeeIsAlreadyInProject(oldProjectAssignments, newProjectAssignment);
+        this.employeeService.checkIfEmployeeExists(newProjectAssignment.getEmployeeId());
+        this.employeeService.checkIfEmployeeHaveQualification(newProjectAssignment.getEmployeeId(), newProjectAssignment.getQualificationId());
+
+        oldProjectAssignments.add(newProjectAssignment);
+        project.setAssignments(oldProjectAssignments);
 
         this.projectRepository.save(project);
+    }
+
+    public void checkIfEmployeeIsAlreadyInProject(Set<ProjectAssignment> oldProjectAssignments, ProjectAssignment newProjectAssignment) {
+        for (ProjectAssignment oldProjectAssignment : oldProjectAssignments) {
+            if (oldProjectAssignment.getEmployeeId() == newProjectAssignment.getEmployeeId()) {
+                throw new EmployeeAlreadyInThisProject("The Employee with ID " + newProjectAssignment.getEmployeeId() +  " is already a part of the project!");
+            }
+        }
     }
 }

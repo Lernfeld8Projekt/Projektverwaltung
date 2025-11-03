@@ -86,13 +86,14 @@ public class MappingService {
         ProjectAssignment projectAssignment = new ProjectAssignment();
         projectAssignment.setProject(projectEntity);
         projectAssignment.setEmployeeId(addEmployeeToProjectDTO.getEmployeeId());
-        projectAssignment.setQualificationId(addEmployeeToProjectDTO.getEmployeeId());
+        projectAssignment.setQualificationId(addEmployeeToProjectDTO.getQualification());
         return projectAssignment;
     }
 
     public GetProjectEmployeeDTO mapProjectAssignmentToGetProjectEmployeeDTO(ProjectAssignment projectAssignment, NameDTO name) {
         GetProjectEmployeeDTO getProjectEmployeeDTO = new GetProjectEmployeeDTO();
         getProjectEmployeeDTO.setProjectId(projectAssignment.getProject().getId());
+        getProjectEmployeeDTO.setTitle(projectAssignment.getProject().getTitle());
         getProjectEmployeeDTO.setEmployeeId(projectAssignment.getEmployeeId());
         getProjectEmployeeDTO.setEmployeeLastName(name.getLastName());
         getProjectEmployeeDTO.setEmployeeFirstName(name.getFirstName());
