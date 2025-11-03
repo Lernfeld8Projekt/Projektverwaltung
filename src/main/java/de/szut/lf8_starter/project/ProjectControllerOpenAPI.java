@@ -75,8 +75,8 @@ public interface ProjectControllerOpenAPI {
                     content = @Content)})
     ResponseEntity<GetProjectDTO> getProjectById(Long id);
 
-    @Operation(summary = "Add an Employee to an existing project by with its given project id as a parameter and" +
-            "in its body with the employee id and the qualification id.")
+    @Operation(summary = "Add an Employee to an existing project with its project id, " +
+            " the employee id and the qualification id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "added employee to project",
                     content = {@Content(mediaType = "application/json",
