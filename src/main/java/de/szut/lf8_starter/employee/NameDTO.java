@@ -6,5 +6,4 @@ import lombok.Data;
 public class NameDTO {
     private String firstName;
     private String lastName;
-
 }

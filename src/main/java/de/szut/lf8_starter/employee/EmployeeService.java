@@ -47,7 +47,6 @@ public class EmployeeService {
 
             SkillSetDTO skillSetDTO = response.getBody();
 
-
             if (skillSetDTO != null ) {
                 boolean hasQualification = skillSetDTO.getSkillSet().stream().anyMatch(skill -> qualificationId.equals(skill.getId()));
                 if (hasQualification) {
