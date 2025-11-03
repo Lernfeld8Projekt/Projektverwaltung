@@ -41,8 +41,8 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "Project, Employee or Customer not found",
                     content = @Content),
     })
-
     ResponseEntity<GetProjectDTO> updateProject(Long id, PatchProjectDTO patchProjectDTO);
+
     @Operation(summary = "Delete a project with its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Project Deleted",

@@ -3,6 +3,7 @@ package de.szut.lf8_starter.project;
 import de.szut.lf8_starter.customer.CustomerService;
 import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
+import de.szut.lf8_starter.exceptionHandling.EmployeeAlreadyInThisProject;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -11,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProjectService {
@@ -38,8 +40,7 @@ public class ProjectService {
     }
 
     public ProjectEntity patchProject(Long id, Map<String,Object> fields) {
-        ProjectEntity entityToPatch = this.projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
+        ProjectEntity entityToPatch = this.getProjectById(id);
 
         fields.forEach((key, value) -> {
             Field field = ReflectionUtils.findField(ProjectEntity.class, key);
@@ -63,26 +64,57 @@ public class ProjectService {
         if (projectEntity.getCustomerId() != null && !customerService.checkIfCustomerExists(projectEntity.getCustomerId())) {
             throw new ResourceNotFoundException("Customer not found on id: " + projectEntity.getCustomerId());
         }
+
         if (projectEntity.getResponsibleEmployeeId() != null && !employeeService.checkIfEmployeeExists(projectEntity.getResponsibleEmployeeId())) {
             throw new ResourceNotFoundException("Employee not found on id: " + projectEntity.getResponsibleEmployeeId());
         }
     }
 
     public void deleteProjectById(final Long id) {
-        ProjectEntity projectEntity = this.projectRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Project with ID " + id + " not found."));
+        ProjectEntity projectEntity = this.getProjectById(id);
         this.projectRepository.delete(projectEntity);
     }
 
+    public void addEmployeeToProject(final Long projectId, ProjectAssignment newProjectAssignment) {
+        ProjectEntity project = this.getProjectById(projectId);
+
+        Set<ProjectAssignment> oldProjectAssignments = project.getAssignments();
+        Long employeeId = newProjectAssignment.getEmployeeId();
+
+        if (isEmployeeInProject(oldProjectAssignments, employeeId)) {
+            throw new EmployeeAlreadyInThisProject("The Employee with ID " + employeeId +  " is already a part of the project!");
+        }
+        this.employeeService.checkIfEmployeeExists(employeeId);
+        this.employeeService.checkIfEmployeeHaveQualification(employeeId, newProjectAssignment.getQualificationId());
+
+        oldProjectAssignments.add(newProjectAssignment);
+        project.setAssignments(oldProjectAssignments);
+
+        this.projectRepository.save(project);
+    }
+
+    public boolean isEmployeeInProject(Set<ProjectAssignment> oldProjectAssignments, Long employeeId) {
+        for (ProjectAssignment oldProjectAssignment : oldProjectAssignments) {
+            if (oldProjectAssignment.getEmployeeId().equals(employeeId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void removeEmployeeFromProject(Long projectId, Long employeeId) {
-        ProjectEntity project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + projectId));
+        ProjectEntity project = this.getProjectById(projectId);
 
         if (employeeService.checkIfEmployeeExists(employeeId)) {
-            throw new ResourceNotFoundException("Employee not found on id: " +employeeId);
+            throw new ResourceNotFoundException("Employee not found on id: " + employeeId);
         }
 
-        //schauen ob mitarbeiter im Projekt ist
-        //project remove employee
+        Set<ProjectAssignment> assignments = project.getAssignments();
+        if (!isEmployeeInProject(assignments, employeeId)) {
+            throw new EmployeeAlreadyInThisProject("The Employee with ID " + employeeId +  " is not a part of the project!");
+        }
+
+        assignments.removeIf(current_employeeId -> current_employeeId.equals(employeeId));
+        project.setAssignments(assignments);
     }
 }
