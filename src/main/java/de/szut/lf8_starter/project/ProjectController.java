@@ -27,7 +27,6 @@ public class ProjectController implements ProjectControllerOpenAPI {
     public ProjectController(MappingService mappingService, ProjectService projectService) {
         this.mappingService = mappingService;
         this.projectService = projectService;
-
     }
 
     @PostMapping

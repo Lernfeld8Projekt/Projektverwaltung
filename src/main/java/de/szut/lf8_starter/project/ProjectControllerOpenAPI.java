@@ -1,6 +1,7 @@
 package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.project.DTO.AddProjectDTO;
+import de.szut.lf8_starter.project.DTO.GetEmployeeProjectsDTO;
 import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,4 +77,15 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "resource not found",
                     content = @Content)})
     ResponseEntity<GetProjectDTO> getProjectById(Long id);
+
+    @Operation(summary = "Show all Projects of employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "projects with given employee-id",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetEmployeeProjectsDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "not authorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "resource not found",
+                    content = @Content)})
+    ResponseEntity<GetEmployeeProjectsDTO> getProjectsByEmployeeId(Long id);
 }
