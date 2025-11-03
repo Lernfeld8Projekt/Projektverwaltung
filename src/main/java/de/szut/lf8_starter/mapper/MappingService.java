@@ -74,15 +74,6 @@ public class MappingService {
         return getProjectDTOList;
     }
 
-    //    public GetEmployeeProjectsDTO mapEmployeeProjects(Long employeeId, Map<String, Object> employeeData, List<GetProjectDTO> projectDTOs) {
-//
-//        GetEmployeeProjectsDTO response = new GetEmployeeProjectsDTO();
-//        response.setEmployeeId(employeeId);
-//        response.setEmployeeName(firstName + " " + lastName);
-//        response.setSkillSet(skills);
-//        response.setProjects(projectDTOs);
-//        return response;
-//    }
     public GetEmployeeProjectsDTO mapEmployeeProjects(Long employeeId, Map<String, Object> employeeData, List<GetProjectDTO> projectDTOs) {
         String firstName = (String) employeeData.get("firstName");
         String lastName = (String) employeeData.get("lastName");
