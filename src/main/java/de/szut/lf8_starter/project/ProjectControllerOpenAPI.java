@@ -1,8 +1,6 @@
 package de.szut.lf8_starter.project;
 
-import de.szut.lf8_starter.project.DTO.AddProjectDTO;
-import de.szut.lf8_starter.project.DTO.GetProjectDTO;
-import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
+import de.szut.lf8_starter.project.DTO.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -76,4 +74,19 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "resource not found",
                     content = @Content)})
     ResponseEntity<GetProjectDTO> getProjectById(Long id);
+
+    @Operation(summary = "Add an Employee to an existing project with its project id, " +
+            " the employee id and the qualification id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "added employee to project",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetProjectEmployeeDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "invalid JSON posted",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "not authorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "employee is already in the project.",
+                    content = @Content)
+    })
+    ResponseEntity<GetProjectEmployeeDTO> addEmployeeToProject(Long projectID,AddEmployeeToProjectDTO addEmployeeToProjectDTO);
 }
