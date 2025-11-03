@@ -7,10 +7,13 @@ import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
+import javax.sound.sampled.Port;
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Map;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProjectService {
@@ -75,7 +78,17 @@ public class ProjectService {
         this.projectRepository.delete(projectEntity);
     }
 
-    public void addEmployeeToProject(final Long projectId) {
+    public void addEmployeeToProject(final Long projectId, ProjectAssignment projectAssignment) {
+        ProjectEntity project = this.projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found on ID: " + projectId));
 
+        Set<ProjectAssignment> projectAssignments = project.getAssignments();
+        projectAssignments.add(projectAssignment);
+        project.setAssignments(projectAssignments);
+
+        this.employeeService.checkIfEmployeeExists(projectAssignment.getEmployeeId());
+        this.employeeService.checkIfEmployeeHaveQualification(projectAssignment.getEmployeeId(), projectAssignment.getQualificationId());
+
+        this.projectRepository.save(project);
     }
 }

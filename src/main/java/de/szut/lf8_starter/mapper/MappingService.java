@@ -1,9 +1,11 @@
 package de.szut.lf8_starter.mapper;
 
-import de.szut.lf8_starter.project.DTO.AddProjectDTO;
-import de.szut.lf8_starter.project.DTO.GetProjectDTO;
-import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
+import de.szut.lf8_starter.employee.NameDTO;
+import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_starter.project.DTO.*;
+import de.szut.lf8_starter.project.ProjectAssignment;
 import de.szut.lf8_starter.project.ProjectEntity;
+import de.szut.lf8_starter.project.ProjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -14,6 +16,12 @@ import java.util.List;
 
 @Service
 public class MappingService {
+    private final ProjectRepository projectRepository;
+
+    public MappingService(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
+
     public ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO){
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setTitle(addProjectDTO.getTitle());
@@ -69,5 +77,26 @@ public class MappingService {
             getProjectDTOList.add(this.mapProjectEntityToGetProjectDTO(projectEntity));
         }
         return getProjectDTOList;
+    }
+
+    public ProjectAssignment mapAddEmployeeToProjectDTOToProjectAssignment(Long projectId, AddEmployeeToProjectDTO addEmployeeToProjectDTO) {
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found on ID: " + projectId));
+
+        ProjectAssignment projectAssignment = new ProjectAssignment();
+        projectAssignment.setProject(projectEntity);
+        projectAssignment.setEmployeeId(addEmployeeToProjectDTO.getEmployeeId());
+        projectAssignment.setQualificationId(addEmployeeToProjectDTO.getEmployeeId());
+        return projectAssignment;
+    }
+
+    public GetProjectEmployeeDTO mapProjectAssignmentToGetProjectEmployeeDTO(ProjectAssignment projectAssignment, NameDTO name) {
+        GetProjectEmployeeDTO getProjectEmployeeDTO = new GetProjectEmployeeDTO();
+        getProjectEmployeeDTO.setProjectId(projectAssignment.getProject().getId());
+        getProjectEmployeeDTO.setEmployeeId(projectAssignment.getEmployeeId());
+        getProjectEmployeeDTO.setEmployeeLastName(name.getLastName());
+        getProjectEmployeeDTO.setEmployeeFirstName(name.getFirstName());
+        getProjectEmployeeDTO.setQualification(projectAssignment.getQualificationId());
+        return getProjectEmployeeDTO;
     }
 }
