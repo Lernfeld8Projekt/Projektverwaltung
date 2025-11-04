@@ -10,6 +10,7 @@ import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
 import de.szut.lf8_starter.project.ProjectEntity;
 import de.szut.lf8_starter.project.ProjectRepository;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -103,6 +104,14 @@ public class MappingService {
         getProjectEmployeeDTO.setEmployeeFirstName(name.getFirstName());
         getProjectEmployeeDTO.setQualification(projectAssignment.getQualificationId());
         return getProjectEmployeeDTO;
+    }
+
+    public ProjectAssignment mapProjectEntityAndQualificationIdToProjectAssignment(ProjectEntity projectEntity, Long qualificationId) {
+        ProjectAssignment projectAssignment = new ProjectAssignment();
+        projectAssignment.setProject(projectEntity);
+        projectAssignment.setEmployeeId(projectEntity.getResponsibleEmployeeId());
+        projectAssignment.setQualificationId(qualificationId);
+        return projectAssignment;
     }
 
     public GetEmployeeProjectsDTO mapEmployeeProjects(Long employeeId, Map<String, Object> employeeData, List<GetProjectDTO> projectDTOs) {

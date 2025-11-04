@@ -1,6 +1,7 @@
 package de.szut.lf8_starter.project.DTO;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -9,9 +10,9 @@ import java.time.LocalDate;
 public class AddProjectDTO {
     @NotBlank(message = "Title is mandatory")
     private String title;
-    @NotBlank(message = "Responsible Employee ID is mandatory")
+    @NotNull(message = "Responsible Employee ID is mandatory")
     private Long responsibleEmployeeId;
-    @NotBlank(message = "Customer ID is mandatory")
+    @NotNull(message = "Customer ID is mandatory")
     private Long customerId;
     @NotBlank(message = "Customer representative name is mandatory")
     private String customerRepresentativeName;

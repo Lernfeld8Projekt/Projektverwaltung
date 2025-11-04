@@ -4,11 +4,14 @@ import de.szut.lf8_starter.customer.CustomerService;
 import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
 import de.szut.lf8_starter.exceptionHandling.EmployeeAlreadyInThisProject;
+import de.szut.lf8_starter.exceptionHandling.EmployeeNotAvailableException;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_starter.mapper.MappingService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -91,6 +94,10 @@ public class ProjectService {
         this.employeeService.checkIfEmployeeExists(employeeId);
         this.employeeService.checkIfEmployeeHaveQualification(employeeId, newProjectAssignment.getQualificationId());
 
+        if(project.getActualEndDate() == null) {
+            this.isEmployeeAvailable(employeeId, project.getStartDate(), project.getPlannedEndDate());
+        }
+
         oldProjectAssignments.add(newProjectAssignment);
         project.setAssignments(oldProjectAssignments);
 
@@ -106,12 +113,25 @@ public class ProjectService {
         return false;
     }
 
-//    public List<ProjectEntity> getProjectsByEmployeeId(Long employeeId) {
-//        if (!employeeService.checkIfEmployeeExists(employeeId)) {
-//            throw new ResourceNotFoundException("Employee with ID " + employeeId + "  not found.");
-//        }
-//        return projectRepository.findProjectsByResponsibleEmployeeId(employeeId);
-//    }
+    public void isEmployeeAvailable(Long employeeId, LocalDate startDate, LocalDate plannedEndDate) {
+        List<ProjectEntity> projectEntities = this.getAllProjects();
+
+        for (ProjectEntity project : projectEntities) {
+            for (ProjectAssignment projectAssignment : project.getAssignments()) {
+                if (projectAssignment.getEmployeeId().equals(employeeId)) {
+                    LocalDate loadedStartDate = project.getStartDate();
+                    LocalDate loadedPlannedEndDate = project.getPlannedEndDate();
+
+                    boolean overlaps = ((startDate.isBefore(loadedPlannedEndDate) || startDate.isEqual(loadedPlannedEndDate))
+                            && (plannedEndDate.isAfter(loadedStartDate) || plannedEndDate.isEqual(loadedStartDate)));
+
+                    if (overlaps) {
+                        throw new EmployeeNotAvailableException("Employee is already in a project in the period from " + loadedStartDate + " to " + loadedPlannedEndDate);
+                    }
+                }
+            }
+        }
+    }
 
     public List<ProjectEntity> getProjectsByEmployeeId(Long employeeId) {
         List<ProjectEntity> allProjects = this.getAllProjects();

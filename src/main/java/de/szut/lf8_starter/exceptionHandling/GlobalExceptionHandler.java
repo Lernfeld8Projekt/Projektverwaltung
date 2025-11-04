@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -19,7 +20,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     @ApiResponse(responseCode = "404", description = "Resource not found",
             content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
-    public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler {
             @ApiResponse(responseCode = "400", description = "Invalid date provided",
                     content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
     })
-    public ResponseEntity<?> handleDateNotValidException(DateNotValidException ex, WebRequest request) {
+    public ResponseEntity<ErrorDetails> handleDateNotValidException(DateNotValidException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, BAD_REQUEST);
     }
@@ -40,6 +41,16 @@ public class GlobalExceptionHandler {
                     content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
     })
     public ResponseEntity<?> handleEmployeeAlreadyInThisProjectException(EmployeeAlreadyInThisProject ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, CONFLICT);
+    }
+
+    @ExceptionHandler(EmployeeNotAvailableException.class)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "409", description = "Employee is already booked in this period",
+                    content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+    })
+    public ResponseEntity<?> handleEmployeeNotAvailableException(EmployeeNotAvailableException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, CONFLICT);
     }

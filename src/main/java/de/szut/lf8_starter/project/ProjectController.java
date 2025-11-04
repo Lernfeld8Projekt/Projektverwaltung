@@ -32,9 +32,11 @@ public class ProjectController implements ProjectControllerOpenAPI {
     }
 
     @PostMapping
-    public ResponseEntity<GetProjectDTO> createProject(@Valid @RequestBody AddProjectDTO addProjectDTO) {
+    public ResponseEntity<GetProjectDTO> createProject(@Valid @RequestBody final AddProjectDTO addProjectDTO) {
         ProjectEntity projectEntity = this.mappingService.mapAddProjectDTOtoProjectEntity(addProjectDTO);
         projectEntity = this.projectService.createProject(projectEntity);
+        ProjectAssignment responsibleEmployeeAssignment = this.mappingService.mapProjectEntityAndQualificationIdToProjectAssignment(projectEntity, 11L);
+        this.projectService.addEmployeeToProject(projectEntity.getId(), responsibleEmployeeAssignment);
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
         return new ResponseEntity<>(projectDTO, CREATED);
     }
