@@ -81,7 +81,7 @@ public class MappingService {
 
     public ProjectAssignment mapAddEmployeeToProjectDTOToProjectAssignment(Long projectId, AddEmployeeToProjectDTO addEmployeeToProjectDTO) {
         ProjectEntity projectEntity = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found on ID: " + projectId));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + projectId));
 
         ProjectAssignment projectAssignment = new ProjectAssignment();
         projectAssignment.setProject(projectEntity);

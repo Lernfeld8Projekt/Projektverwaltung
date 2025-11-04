@@ -81,12 +81,15 @@ public class ProjectService {
         ProjectEntity project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found on ID: " + projectId));
 
-
         Set<ProjectAssignment> oldProjectAssignments = project.getAssignments();
+        Long employeeId = newProjectAssignment.getEmployeeId();
 
-        checkIfEmployeeIsAlreadyInProject(oldProjectAssignments, newProjectAssignment);
-        this.employeeService.checkIfEmployeeExists(newProjectAssignment.getEmployeeId());
-        this.employeeService.checkIfEmployeeHaveQualification(newProjectAssignment.getEmployeeId(), newProjectAssignment.getQualificationId());
+        if (isEmployeeInProject(oldProjectAssignments, employeeId)) {
+            throw new EmployeeAlreadyInThisProject("The Employee with ID " + employeeId + " is already a part of the project!");
+        }
+
+        this.employeeService.checkIfEmployeeExists(employeeId);
+        this.employeeService.checkIfEmployeeHaveQualification(employeeId, newProjectAssignment.getQualificationId());
 
         oldProjectAssignments.add(newProjectAssignment);
         project.setAssignments(oldProjectAssignments);
@@ -94,11 +97,12 @@ public class ProjectService {
         this.projectRepository.save(project);
     }
 
-    public void checkIfEmployeeIsAlreadyInProject(Set<ProjectAssignment> oldProjectAssignments, ProjectAssignment newProjectAssignment) {
+    public boolean isEmployeeInProject(Set<ProjectAssignment> oldProjectAssignments, Long employeeId) {
         for (ProjectAssignment oldProjectAssignment : oldProjectAssignments) {
-            if (oldProjectAssignment.getEmployeeId() == newProjectAssignment.getEmployeeId()) {
-                throw new EmployeeAlreadyInThisProject("The Employee with ID " + newProjectAssignment.getEmployeeId() +  " is already a part of the project!");
+            if (oldProjectAssignment.getEmployeeId() == employeeId) {
+                return true;
             }
         }
+        return false;
     }
 }
