@@ -11,7 +11,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
         NameDTO nameDTO = new NameDTO();
         nameDTO.setLastName("Rosenbaum");
         nameDTO.setFirstName("Jarne");
-        Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(1L);
+        Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(2L);
         Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
 
         var projectEntity = new ProjectEntity();
@@ -59,7 +58,7 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
 
         final String content = """
                   {
-                    "employeeId": 1,
+                    "employeeId": 2,
                     "qualification": 1
                 }
                 """;
@@ -68,9 +67,9 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
                         .content(content).contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("projectId", is(1)))
+                .andExpect(jsonPath("projectId", is(projectEntity.getId().intValue())))
                 .andExpect(jsonPath("title", is("BFK")))
-                .andExpect(jsonPath("employeeId", is(1)))
+                .andExpect(jsonPath("employeeId", is(2)))
                 .andExpect(jsonPath("employeeLastName", is("Rosenbaum")))
                 .andExpect(jsonPath("employeeFirstName", is("Jarne")))
                 .andExpect(jsonPath("qualification", is(1)))
@@ -89,7 +88,7 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
         assertThat(projectAssignment).isIn(projectAssignments);
         assertThat(projectAssignment.getId()).isNotNull();
         assertThat(projectAssignment.getProject()).isEqualTo(project.get());
-        assertThat(projectAssignment.getEmployeeId()).isEqualTo(1);
+        assertThat(projectAssignment.getEmployeeId()).isEqualTo(2);
         assertThat(projectAssignment.getQualificationId()).isEqualTo(1);
     }
 
@@ -221,5 +220,166 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is("Project not found on id: 6725812")));
 
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void employeeIsAlreadyBookedInProjectPeriod() throws Exception {
+        NameDTO nameDTO = new NameDTO();
+        nameDTO.setLastName("Rosenbaum");
+        nameDTO.setFirstName("Jarne");
+        Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(1L);
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
+
+        var firstProjectEntity = new ProjectEntity();
+        firstProjectEntity.setTitle("BFK");
+        firstProjectEntity.setResponsibleEmployeeId(1L);
+        firstProjectEntity.setCustomerId(1L);
+        firstProjectEntity.setCustomerRepresentativeName("Max Meyer");
+        firstProjectEntity.setGoal("Project fertig machen");
+        firstProjectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        firstProjectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+
+        ProjectAssignment projectAssignment = new ProjectAssignment();
+        projectAssignment.setProject(firstProjectEntity);
+        projectAssignment.setEmployeeId(1L);
+        projectAssignment.setQualificationId(1L);
+
+        Set<ProjectAssignment> projectAssignments = new HashSet<>();
+        projectAssignments.add(projectAssignment);
+
+        firstProjectEntity.setAssignments(projectAssignments);
+        this.projectRepository.save(firstProjectEntity);
+
+        var secondProjectEntity = new ProjectEntity();
+        secondProjectEntity.setTitle("BFK");
+        secondProjectEntity.setResponsibleEmployeeId(1L);
+        secondProjectEntity.setCustomerId(1L);
+        secondProjectEntity.setCustomerRepresentativeName("Max Meyer");
+        secondProjectEntity.setGoal("Project fertig machen");
+        secondProjectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        secondProjectEntity.setPlannedEndDate(LocalDate.parse("2027-01-01"));
+        this.projectRepository.save(secondProjectEntity);
+
+        final String content = """
+                  {
+                    "employeeId": 1,
+                    "qualification": 1
+                }
+                """;
+
+        this.mockMvc.perform(post("/project/{projectID}", secondProjectEntity.getId())
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", is("Employee is already in a project in the period from 2026-07-07 to 2028-01-01")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    //Das Startdatum liegt vor dem geblockten Zeitraum und das Enddatum im geblockten Zeitraum
+    void overlappingProjectEndDate() throws Exception {
+        NameDTO nameDTO = new NameDTO();
+        nameDTO.setLastName("Rosenbaum");
+        nameDTO.setFirstName("Jarne");
+        Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(1L);
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
+
+        var firstProjectEntity = new ProjectEntity();
+        firstProjectEntity.setTitle("BFK");
+        firstProjectEntity.setResponsibleEmployeeId(1L);
+        firstProjectEntity.setCustomerId(1L);
+        firstProjectEntity.setCustomerRepresentativeName("Max Meyer");
+        firstProjectEntity.setGoal("Project fertig machen");
+        firstProjectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        firstProjectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+
+        ProjectAssignment projectAssignment = new ProjectAssignment();
+        projectAssignment.setProject(firstProjectEntity);
+        projectAssignment.setEmployeeId(1L);
+        projectAssignment.setQualificationId(1L);
+
+        Set<ProjectAssignment> projectAssignments = new HashSet<>();
+        projectAssignments.add(projectAssignment);
+
+        firstProjectEntity.setAssignments(projectAssignments);
+        this.projectRepository.save(firstProjectEntity);
+
+        var secondProjectEntity = new ProjectEntity();
+        secondProjectEntity.setTitle("BFK");
+        secondProjectEntity.setResponsibleEmployeeId(1L);
+        secondProjectEntity.setCustomerId(1L);
+        secondProjectEntity.setCustomerRepresentativeName("Max Meyer");
+        secondProjectEntity.setGoal("Project fertig machen");
+        secondProjectEntity.setStartDate(LocalDate.parse("2025-07-07"));
+        secondProjectEntity.setPlannedEndDate(LocalDate.parse("2027-01-01"));
+        this.projectRepository.save(secondProjectEntity);
+
+        final String content = """
+                  {
+                    "employeeId": 1,
+                    "qualification": 1
+                }
+                """;
+
+        this.mockMvc.perform(post("/project/{projectID}", secondProjectEntity.getId())
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", is("Employee is already in a project in the period from 2026-07-07 to 2028-01-01")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+        //Das Startdatum liegt in dem geblockten Zeitraum und das Enddatum hinter dem geblockten Zeitraum
+    void overlappingProjectStartDate() throws Exception {
+        NameDTO nameDTO = new NameDTO();
+        nameDTO.setLastName("Rosenbaum");
+        nameDTO.setFirstName("Jarne");
+        Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(1L);
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
+
+        var firstProjectEntity = new ProjectEntity();
+        firstProjectEntity.setTitle("BFK");
+        firstProjectEntity.setResponsibleEmployeeId(1L);
+        firstProjectEntity.setCustomerId(1L);
+        firstProjectEntity.setCustomerRepresentativeName("Max Meyer");
+        firstProjectEntity.setGoal("Project fertig machen");
+        firstProjectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        firstProjectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+
+        ProjectAssignment projectAssignment = new ProjectAssignment();
+        projectAssignment.setProject(firstProjectEntity);
+        projectAssignment.setEmployeeId(1L);
+        projectAssignment.setQualificationId(1L);
+
+        Set<ProjectAssignment> projectAssignments = new HashSet<>();
+        projectAssignments.add(projectAssignment);
+
+        firstProjectEntity.setAssignments(projectAssignments);
+        this.projectRepository.save(firstProjectEntity);
+
+        var secondProjectEntity = new ProjectEntity();
+        secondProjectEntity.setTitle("BFK");
+        secondProjectEntity.setResponsibleEmployeeId(1L);
+        secondProjectEntity.setCustomerId(1L);
+        secondProjectEntity.setCustomerRepresentativeName("Max Meyer");
+        secondProjectEntity.setGoal("Project fertig machen");
+        secondProjectEntity.setStartDate(LocalDate.parse("2026-09-07"));
+        secondProjectEntity.setPlannedEndDate(LocalDate.parse("2029-01-01"));
+        this.projectRepository.save(secondProjectEntity);
+
+        final String content = """
+                  {
+                    "employeeId": 1,
+                    "qualification": 1
+                }
+                """;
+
+        this.mockMvc.perform(post("/project/{projectID}", secondProjectEntity.getId())
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", is("Employee is already in a project in the period from 2026-07-07 to 2028-01-01")));
     }
 }
