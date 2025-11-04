@@ -134,7 +134,6 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
                 .with(csrf()))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message", is("The Employee with ID 1 is already a part of the project!")));
-
     }
 
     @Test
@@ -198,7 +197,6 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
                         .with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is("Qualification not found for employee on ID: 3")));
-
     }
 
     @Test
@@ -224,6 +222,4 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.message", is("Project not found on id: 6725812")));
 
     }
-
-
 }
