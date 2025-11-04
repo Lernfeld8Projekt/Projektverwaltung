@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class GetEmployeeProjectsDTO {
     private Long employeeId;
-    private String employeeName;
-    private List<String> skillSet;
-    private List<GetProjectDTO> projects;
+    private String employeeFirstName;
+    private String employeeLastName;
+    private List<GetEmployeeReducedProjectDTO> projects;
 }

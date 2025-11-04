@@ -79,10 +79,9 @@ public class ProjectController implements ProjectControllerOpenAPI {
 
     @GetMapping("/employee/{employeeId}")
     public ResponseEntity<GetEmployeeProjectsDTO> getProjectsByEmployeeId(@PathVariable Long employeeId) {
-        Map<String, Object> employeeData = employeeService.getEmployeeById(employeeId);
+        NameDTO name = employeeService.getEmployeeName(employeeId);
         List<ProjectEntity> projects = projectService.getProjectsByEmployeeId(employeeId);
-        List<GetProjectDTO> projectDTOs = mappingService.mapProjectListToGetProjectDTOList(projects);
-        GetEmployeeProjectsDTO response = mappingService.mapEmployeeProjects(employeeId, employeeData, projectDTOs);
+        GetEmployeeProjectsDTO response = mappingService.mapEmployeeProjects(employeeId, name, projects);
         return ResponseEntity.ok(response);
     }
 }

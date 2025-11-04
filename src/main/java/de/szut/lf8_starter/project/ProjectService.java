@@ -134,11 +134,14 @@ public class ProjectService {
     }
 
     public List<ProjectEntity> getProjectsByEmployeeId(Long employeeId) {
+        if (!employeeService.checkIfEmployeeExists(employeeId)) {
+            throw new ResourceNotFoundException("Employee not found on id: " + employeeId);
+        }
+
         List<ProjectEntity> allProjects = this.getAllProjects();
         List<ProjectEntity> employeeProjects = new ArrayList<>();
 
         for (ProjectEntity project : allProjects) {
-            project.getAssignments().size();
             Set<ProjectAssignment> assignments = project.getAssignments();
             for (ProjectAssignment assignment : assignments) {
                 if (assignment.getEmployeeId().equals(employeeId)) {

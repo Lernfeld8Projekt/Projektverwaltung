@@ -10,14 +10,10 @@ import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
 import de.szut.lf8_starter.project.ProjectEntity;
 import de.szut.lf8_starter.project.ProjectRepository;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class MappingService {
@@ -106,21 +102,33 @@ public class MappingService {
         return getProjectEmployeeDTO;
     }
 
-    public GetEmployeeProjectsDTO mapEmployeeProjects(Long employeeId, Map<String, Object> employeeData, List<GetProjectDTO> projectDTOs) {
-        String firstName = (String) employeeData.get("firstName");
-        String lastName = (String) employeeData.get("lastName");
-
-        List<Map<String, Object>> skillMaps = (List<Map<String, Object>>) employeeData.get("skillSet");
-
-        List<String> skills = skillMaps.stream()
-                .map(skill -> (String) skill.get("skill"))
-                .toList();
-
+    public GetEmployeeProjectsDTO mapEmployeeProjects(Long employeeId, NameDTO name, List<ProjectEntity> projects) {
         GetEmployeeProjectsDTO response = new GetEmployeeProjectsDTO();
         response.setEmployeeId(employeeId);
-        response.setEmployeeName(firstName + " " + lastName);
-        response.setSkillSet(skills);
-        response.setProjects(projectDTOs);
+        response.setEmployeeFirstName(name.getFirstName());
+        response.setEmployeeLastName(name.getLastName());
+        List<GetEmployeeReducedProjectDTO> getEmployeeReducedProjectDTOList = new ArrayList<>();
+        for (ProjectEntity project : projects){
+            GetEmployeeReducedProjectDTO getEmployeeReducedProjectDTO = mapProjectToGetEmployeeReducedProjectDTO(employeeId, project);
+            getEmployeeReducedProjectDTOList.add(getEmployeeReducedProjectDTO);
+        }
+        response.setProjects(getEmployeeReducedProjectDTOList);
         return response;
+    }
+
+    private static GetEmployeeReducedProjectDTO mapProjectToGetEmployeeReducedProjectDTO(Long employeeId, ProjectEntity project) {
+        GetEmployeeReducedProjectDTO getEmployeeReducedProjectDTO = new GetEmployeeReducedProjectDTO();
+        getEmployeeReducedProjectDTO.setId(project.getId());
+        getEmployeeReducedProjectDTO.setTitle(project.getTitle());
+        getEmployeeReducedProjectDTO.setStartDate(project.getStartDate());
+        getEmployeeReducedProjectDTO.setPlannedEndDate(project.getPlannedEndDate());
+        getEmployeeReducedProjectDTO.setActualEndDate(project.getActualEndDate());
+        Set<ProjectAssignment> projectAssignmentsSet = project.getAssignments();
+        for (ProjectAssignment assignment : projectAssignmentsSet){
+            if (assignment.getEmployeeId().equals(employeeId)) {
+                getEmployeeReducedProjectDTO.setEmployeeQualification(assignment.getQualificationId());
+            }
+        }
+        return getEmployeeReducedProjectDTO;
     }
 }

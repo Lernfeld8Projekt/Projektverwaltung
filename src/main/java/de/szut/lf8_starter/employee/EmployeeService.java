@@ -78,20 +78,4 @@ public class EmployeeService {
             throw new ResourceNotFoundException(exception.getMessage());
         }
     }
-
-    public Map<String, Object> getEmployeeById(Long id) {
-        HttpEntity<Void> entity = getHttpEntityWithToken();
-        String urlWithId = this.url + "/" + id;
-
-        try {
-            ResponseEntity<Map> response = this.restTemplate.exchange(urlWithId, HttpMethod.GET, entity, Map.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                return response.getBody();
-            }
-        } catch (HttpClientErrorException.NotFound e) {
-            throw new ResourceNotFoundException("Employee with number " + id + " doesn´t exist.");
-        }
-        throw new ResourceNotFoundException("Employee data could not be loaded.");
-    }
-
 }
