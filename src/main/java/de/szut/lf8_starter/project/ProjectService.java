@@ -22,20 +22,16 @@ public class ProjectService {
     private final CustomerService customerService;
     private final EmployeeService employeeService;
     private final ProjectRepository projectRepository;
-    private final MappingService mappingService;
 
-    public ProjectService(CustomerService customerService, EmployeeService employeeService, ProjectRepository projectRepository, MappingService mappingService) {
+    public ProjectService(CustomerService customerService, EmployeeService employeeService, ProjectRepository projectRepository) {
         this.customerService = customerService;
         this.employeeService = employeeService;
         this.projectRepository = projectRepository;
-        this.mappingService = mappingService;
     }
 
     public ProjectEntity createProject(ProjectEntity projectEntity) {
         validateProjectEntity(projectEntity);
-        ProjectEntity project = this.projectRepository.save(projectEntity);
-        addEmployeeToProject(projectEntity.getId(),this.mappingService.mapProjectEntityAndQualificationIdToProjectAssignment(projectEntity, 11L));
-        return project;
+        return this.projectRepository.save(projectEntity);
     }
 
     public List<ProjectEntity> getAllProjects() {
