@@ -78,8 +78,7 @@ public class ProjectService {
     }
 
     public void addEmployeeToProject(final Long projectId, ProjectAssignment newProjectAssignment) {
-        ProjectEntity project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found on ID: " + projectId));
+        ProjectEntity project = this.getProjectById(projectId);
 
         Set<ProjectAssignment> oldProjectAssignments = project.getAssignments();
         Long employeeId = newProjectAssignment.getEmployeeId();
