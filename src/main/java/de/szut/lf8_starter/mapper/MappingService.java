@@ -101,12 +101,4 @@ public class MappingService {
         getProjectEmployeeDTO.setQualification(projectAssignment.getQualificationId());
         return getProjectEmployeeDTO;
     }
-
-    public ProjectAssignment mapProjectEntityAndQualificationIdToProjectAssignment(ProjectEntity projectEntity, Long qualificationId) {
-        ProjectAssignment projectAssignment = new ProjectAssignment();
-        projectAssignment.setProject(projectEntity);
-        projectAssignment.setEmployeeId(projectEntity.getResponsibleEmployeeId());
-        projectAssignment.setQualificationId(qualificationId);
-        return projectAssignment;
-    }
 }
