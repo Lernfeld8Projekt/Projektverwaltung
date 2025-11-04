@@ -105,7 +105,7 @@ public class ProjectService {
     public void removeEmployeeFromProject(Long projectId, Long employeeId) {
         ProjectEntity project = this.getProjectById(projectId);
 
-        if (employeeService.checkIfEmployeeExists(employeeId)) {
+        if (!employeeService.checkIfEmployeeExists(employeeId)) {
             throw new ResourceNotFoundException("Employee not found on id: " + employeeId);
         }
 
@@ -114,7 +114,8 @@ public class ProjectService {
             throw new EmployeeAlreadyInThisProject("The Employee with ID " + employeeId +  " is not a part of the project!");
         }
 
-        assignments.removeIf(current_employeeId -> current_employeeId.equals(employeeId));
+        assignments.removeIf(assignment -> assignment.getEmployeeId().equals(employeeId));
         project.setAssignments(assignments);
+        projectRepository.save(project);
     }
 }
