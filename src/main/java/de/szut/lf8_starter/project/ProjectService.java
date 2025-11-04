@@ -6,6 +6,7 @@ import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
 import de.szut.lf8_starter.exceptionHandling.EmployeeAlreadyInThisProject;
 import de.szut.lf8_starter.exceptionHandling.EmployeeNotAvailableException;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_starter.mapper.MappingService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
@@ -21,16 +22,20 @@ public class ProjectService {
     private final CustomerService customerService;
     private final EmployeeService employeeService;
     private final ProjectRepository projectRepository;
+    private final MappingService mappingService;
 
-    public ProjectService(CustomerService customerService, EmployeeService employeeService, ProjectRepository projectRepository) {
+    public ProjectService(CustomerService customerService, EmployeeService employeeService, ProjectRepository projectRepository, MappingService mappingService) {
         this.customerService = customerService;
         this.employeeService = employeeService;
         this.projectRepository = projectRepository;
+        this.mappingService = mappingService;
     }
 
     public ProjectEntity createProject(ProjectEntity projectEntity) {
         validateProjectEntity(projectEntity);
-        return this.projectRepository.save(projectEntity);
+        ProjectEntity project = this.projectRepository.save(projectEntity);
+        addEmployeeToProject(projectEntity.getId(),this.mappingService.mapProjectEntityAndQualificationIdToProjectAssignment(projectEntity, 11L));
+        return project;
     }
 
     public List<ProjectEntity> getAllProjects() {
