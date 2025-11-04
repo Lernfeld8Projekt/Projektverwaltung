@@ -6,7 +6,6 @@ import de.szut.lf8_starter.project.DTO.*;
 import de.szut.lf8_starter.project.ProjectAssignment;
 import de.szut.lf8_starter.project.ProjectEntity;
 import de.szut.lf8_starter.project.ProjectRepository;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
