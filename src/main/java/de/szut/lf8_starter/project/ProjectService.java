@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.Map;
-
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -39,7 +39,7 @@ public class ProjectService {
         return this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
     }
 
-    public ProjectEntity patchProject(Long id, Map<String,Object> fields) {
+    public ProjectEntity patchProject(Long id, Map<String, Object> fields) {
         ProjectEntity entityToPatch = this.getProjectById(id);
 
         fields.forEach((key, value) -> {
@@ -52,6 +52,7 @@ public class ProjectService {
 
         return projectRepository.save(entityToPatch);
     }
+
     private void validateProjectEntity(ProjectEntity projectEntity) {
         if (projectEntity.getStartDate() != null && projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
             throw new DateNotValidException("Start date cannot be after planned end date!");
@@ -82,8 +83,9 @@ public class ProjectService {
         Long employeeId = newProjectAssignment.getEmployeeId();
 
         if (isEmployeeInProject(oldProjectAssignments, employeeId)) {
-            throw new EmployeeAlreadyInThisProject("The Employee with ID " + employeeId +  " is already a part of the project!");
+            throw new EmployeeAlreadyInThisProject("The Employee with ID " + employeeId + " is already a part of the project!");
         }
+
         this.employeeService.checkIfEmployeeExists(employeeId);
         this.employeeService.checkIfEmployeeHaveQualification(employeeId, newProjectAssignment.getQualificationId());
 
@@ -95,7 +97,7 @@ public class ProjectService {
 
     public boolean isEmployeeInProject(Set<ProjectAssignment> oldProjectAssignments, Long employeeId) {
         for (ProjectAssignment oldProjectAssignment : oldProjectAssignments) {
-            if (oldProjectAssignment.getEmployeeId().equals(employeeId)) {
+            if (Objects.equals(oldProjectAssignment.getEmployeeId(), employeeId)) {
                 return true;
             }
         }
@@ -104,18 +106,16 @@ public class ProjectService {
 
     public void removeEmployeeFromProject(Long projectId, Long employeeId) {
         ProjectEntity project = this.getProjectById(projectId);
+        Set<ProjectAssignment> assignments = project.getAssignments();
 
         if (!employeeService.checkIfEmployeeExists(employeeId)) {
             throw new ResourceNotFoundException("Employee not found on id: " + employeeId);
         }
-
-        Set<ProjectAssignment> assignments = project.getAssignments();
         if (!isEmployeeInProject(assignments, employeeId)) {
-            throw new EmployeeAlreadyInThisProject("The Employee with ID " + employeeId +  " is not a part of the project!");
+            throw new ResourceNotFoundException("The Employee with ID " + employeeId + " is not a part of the project!");
         }
 
-        assignments.removeIf(assignment -> assignment.getEmployeeId().equals(employeeId));
-        project.setAssignments(assignments);
+        project.getAssignments().removeIf(assignment -> Objects.equals(assignment.getEmployeeId(), employeeId));
         projectRepository.save(project);
     }
 }

@@ -2,15 +2,21 @@ package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.employee.NameDTO;
+import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
+import jakarta.transaction.Transactional;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,12 +38,14 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
     }
 
     @Test
+    @Transactional
     @WithMockUser(roles = "user")
     void addExistingEmployeeToProject() throws Exception {
         NameDTO nameDTO = new NameDTO();
         nameDTO.setLastName("Rosenbaum");
         nameDTO.setFirstName("Jarne");
         Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(1L);
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
 
         var projectEntity = new ProjectEntity();
         projectEntity.setTitle("BFK");
@@ -52,7 +60,7 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
         final String content = """
                   {
                     "employeeId": 1,
-                    "qualification": 1,
+                    "qualification": 1
                 }
                 """;
 
@@ -74,7 +82,144 @@ public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
 
         final var project = projectRepository.findById(projectId);
 
-        Set<ProjectAssignment> projectAssignments = project.get().getAssignments();
+        List<ProjectAssignment> projectAssignments = new ArrayList<>();
+        projectAssignments.addAll(project.get().getAssignments());
+        ProjectAssignment projectAssignment = projectAssignments.getFirst();
+
+        assertThat(projectAssignment).isIn(projectAssignments);
+        assertThat(projectAssignment.getId()).isNotNull();
+        assertThat(projectAssignment.getProject()).isEqualTo(project.get());
+        assertThat(projectAssignment.getEmployeeId()).isEqualTo(1);
+        assertThat(projectAssignment.getQualificationId()).isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void tryToAddAnAlreadyAddedEmployee() throws Exception {
+        NameDTO nameDTO = new NameDTO();
+        nameDTO.setLastName("Rosenbaum");
+        nameDTO.setFirstName("Jarne");
+        Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(1L);
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
+
+        var projectEntity = new ProjectEntity();
+        projectEntity.setTitle("BFK");
+        projectEntity.setResponsibleEmployeeId(1L);
+        projectEntity.setCustomerId(1L);
+        projectEntity.setCustomerRepresentativeName("Max Meyer");
+        projectEntity.setGoal("Project fertig machen");
+        projectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        projectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+
+        ProjectAssignment projectAssignment = new ProjectAssignment();
+        projectAssignment.setProject(projectEntity);
+        projectAssignment.setEmployeeId(1L);
+        projectAssignment.setQualificationId(1L);
+
+        Set<ProjectAssignment> projectAssignments = new HashSet<>();
+        projectAssignments.add(projectAssignment);
+
+        projectEntity.setAssignments(projectAssignments);
+        projectRepository.save(projectEntity);
+
+        final String content = """
+                  {
+                    "employeeId": 1,
+                    "qualification": 1
+                }
+                """;
+
+        this.mockMvc.perform(post("/project/{projectID}", projectEntity.getId())
+                .content(content).contentType(MediaType.APPLICATION_JSON)
+                .with(csrf()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", is("The Employee with ID 1 is already a part of the project!")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void tryToAddANonExistentEmployee() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException("Employee not found on id: 2")).when(employeeService).checkIfEmployeeExists(2L);
+
+        var projectEntity = new ProjectEntity();
+        projectEntity.setTitle("BFK");
+        projectEntity.setResponsibleEmployeeId(1L);
+        projectEntity.setCustomerId(1L);
+        projectEntity.setCustomerRepresentativeName("Max Meyer");
+        projectEntity.setGoal("Project fertig machen");
+        projectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        projectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+        projectRepository.save(projectEntity);
+
+        final String content = """
+                  {
+                    "employeeId": 2,
+                    "qualification": 1
+                }
+                """;
+
+        this.mockMvc.perform(post("/project/{projectID}", projectEntity.getId())
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Employee not found on id: 2")));
+
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void tryToAddAnExistingEmployeeWithoutTheGivenQualification() throws Exception {
+        NameDTO nameDTO = new NameDTO();
+        nameDTO.setLastName("Rosenbaum");
+        nameDTO.setFirstName("Jarne");
+        Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(2L);
+        Mockito.doThrow(new ResourceNotFoundException("Qualification not found for employee on ID: 3")).when(employeeService).checkIfEmployeeHaveQualification(2L, 3L);
+
+        var projectEntity = new ProjectEntity();
+        projectEntity.setTitle("BFK");
+        projectEntity.setResponsibleEmployeeId(1L);
+        projectEntity.setCustomerId(1L);
+        projectEntity.setCustomerRepresentativeName("Max Meyer");
+        projectEntity.setGoal("Project fertig machen");
+        projectEntity.setStartDate(LocalDate.parse("2026-07-07"));
+        projectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
+        projectRepository.save(projectEntity);
+
+        final String content = """
+                  {
+                    "employeeId": 2,
+                    "qualification": 3
+                }
+                """;
+
+        this.mockMvc.perform(post("/project/{projectID}", projectEntity.getId())
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Qualification not found for employee on ID: 3")));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void projectDoesNotExists() throws Exception {
+        NameDTO nameDTO = new NameDTO();
+        nameDTO.setLastName("Rosenbaum");
+        nameDTO.setFirstName("Jarne");
+        Mockito.doReturn(nameDTO).when(employeeService).getEmployeeName(1L);
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
+
+        final String content = """
+                  {
+                    "employeeId": 1,
+                    "qualification": 1
+                }
+                """;
+
+        this.mockMvc.perform(post("/project/{projectID}", 6725812)
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Project not found on id: 6725812")));
 
     }
 }

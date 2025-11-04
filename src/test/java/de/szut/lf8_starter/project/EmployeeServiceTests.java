@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 public class EmployeeServiceTests {
 
     @Test
-    public void checkIfEmployeeHaveQualification_shouldReturnSkillSet(){
+    public void checkIfEmployeeHaveQualification_shouldReturnTrue(){
         EmployeeService employeeService = new EmployeeService();
 
         Long employeeId = 1L;

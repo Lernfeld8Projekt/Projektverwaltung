@@ -75,9 +75,9 @@ public class ProjectController implements ProjectControllerOpenAPI {
         return new ResponseEntity<>(getProjectEmployeeDTO, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{projectId}/{employeeId}")
-    public ResponseEntity<Void> removeEmployeeFromProject(@PathVariable Long projectId, @PathVariable Long employeeId){
-        projectService.removeEmployeeFromProject(projectId, employeeId);
+    @DeleteMapping("/{id}/{employeeId}")
+    public ResponseEntity<Void> removeEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId){
+        projectService.removeEmployeeFromProject(id, employeeId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

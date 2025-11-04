@@ -98,7 +98,7 @@ public interface ProjectControllerOpenAPI {
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "not authorized",
                     content = @Content),
-            @ApiResponse(responseCode = "409", description = "employee is not in the project.",
+            @ApiResponse(responseCode = "404", description = "employee is not in the project.",
                     content = @Content)
     })
     ResponseEntity<Void> removeEmployeeFromProject(Long projectID, Long employeeID);
