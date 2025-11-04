@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Map;
 
 import java.util.List;
@@ -106,14 +107,28 @@ public class ProjectService {
         return false;
     }
 
+//    public List<ProjectEntity> getProjectsByEmployeeId(Long employeeId) {
+//        if (!employeeService.checkIfEmployeeExists(employeeId)) {
+//            throw new ResourceNotFoundException("Employee with ID " + employeeId + "  not found.");
+//        }
+//        return projectRepository.findProjectsByResponsibleEmployeeId(employeeId);
+//    }
+
     public List<ProjectEntity> getProjectsByEmployeeId(Long employeeId) {
-        if (!employeeService.checkIfEmployeeExists(employeeId)) {
-            throw new ResourceNotFoundException("Employee with ID " + employeeId + "  not found.");
+        List<ProjectEntity> allProjects = this.getAllProjects();
+        List<ProjectEntity> employeeProjects = new ArrayList<>();
+
+        for (ProjectEntity project : allProjects) {
+            project.getAssignments().size();
+            Set<ProjectAssignment> assignments = project.getAssignments();
+            for (ProjectAssignment assignment : assignments) {
+                if (assignment.getEmployeeId().equals(employeeId)) {
+                    employeeProjects.add(project);
+                    break;
+                }
+            }
         }
-        return projectRepository.findProjectsByResponsibleEmployeeId(employeeId);
+        return employeeProjects;
     }
 
-    public EmployeeService getEmployeeService() {
-        return this.employeeService;
-    }
 }

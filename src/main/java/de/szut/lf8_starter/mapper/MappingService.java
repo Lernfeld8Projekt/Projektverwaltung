@@ -109,8 +109,7 @@ public class MappingService {
         String firstName = (String) employeeData.get("firstName");
         String lastName = (String) employeeData.get("lastName");
 
-        List<Map<String, Object>> skillMaps =
-                (List<Map<String, Object>>) employeeData.get("skillSet");
+        List<Map<String, Object>> skillMaps = (List<Map<String, Object>>) employeeData.get("skillSet");
 
         List<String> skills = skillMaps.stream()
                 .map(skill -> (String) skill.get("skill"))

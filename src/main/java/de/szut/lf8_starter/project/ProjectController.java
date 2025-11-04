@@ -80,7 +80,7 @@ public class ProjectController implements ProjectControllerOpenAPI {
     @GetMapping("/employee/{employeeId}")
     public ResponseEntity<GetEmployeeProjectsDTO> getProjectsByEmployeeId(@PathVariable Long employeeId) {
 
-        Map<String, Object> employeeData = projectService.getEmployeeService().getEmployeeById(employeeId);
+        Map<String, Object> employeeData = employeeService.getEmployeeById(employeeId);
 
         List<ProjectEntity> projects = projectService.getProjectsByEmployeeId(employeeId);
         List<GetProjectDTO> projectDTOs = mappingService.mapProjectListToGetProjectDTOList(projects);
