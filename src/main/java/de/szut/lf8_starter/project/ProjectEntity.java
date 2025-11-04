@@ -2,6 +2,8 @@ package de.szut.lf8_starter.project;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -31,11 +33,9 @@ public class ProjectEntity {
 
     private LocalDate actualEndDate = null;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "project_employee_ids",
-            joinColumns = @JoinColumn(name = "project_id")
-    )
-    @Column(name = "employee_id")
-    private Set<Long> employees = new HashSet<>();
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<ProjectAssignment> assignments = new HashSet<>();
+
 }

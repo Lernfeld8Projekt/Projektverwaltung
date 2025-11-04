@@ -1,16 +1,15 @@
 package de.szut.lf8_starter.project;
 
+import de.szut.lf8_starter.employee.EmployeeService;
+import de.szut.lf8_starter.employee.NameDTO;
 import de.szut.lf8_starter.mapper.MappingService;
-import de.szut.lf8_starter.project.DTO.AddProjectDTO;
-import de.szut.lf8_starter.project.DTO.GetProjectDTO;
-import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
+import de.szut.lf8_starter.project.DTO.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -22,9 +21,12 @@ public class ProjectController implements ProjectControllerOpenAPI {
     private final MappingService mappingService;
     private final ProjectService projectService;
 
-    public ProjectController(MappingService mappingService, ProjectService projectService) {
+    private final EmployeeService employeeService;
+
+    public ProjectController(MappingService mappingService, ProjectService projectService, EmployeeService employeeService) {
         this.mappingService = mappingService;
         this.projectService = projectService;
+        this.employeeService = employeeService;
     }
 
     @PostMapping
@@ -63,4 +65,14 @@ public class ProjectController implements ProjectControllerOpenAPI {
         GetProjectDTO projectDTO = this.mappingService.mapProjectEntityToGetProjectDTO(projectEntity);
         return new ResponseEntity<>(projectDTO, HttpStatus.OK);
     }
+
+    @PostMapping("/{projectID}")
+    public ResponseEntity<GetProjectEmployeeDTO> addEmployeeToProject(@PathVariable Long projectID, @Valid @RequestBody AddEmployeeToProjectDTO addEmployeeToProjectDTO) {
+        ProjectAssignment projectAssignment = this.mappingService.mapAddEmployeeToProjectDTOToProjectAssignment(projectID, addEmployeeToProjectDTO);
+        this.projectService.addEmployeeToProject(projectID, projectAssignment);
+        NameDTO nameDTO = this.employeeService.getEmployeeName(projectAssignment.getEmployeeId());
+        GetProjectEmployeeDTO getProjectEmployeeDTO = this.mappingService.mapProjectAssignmentToGetProjectEmployeeDTO(projectAssignment, nameDTO);
+        return new ResponseEntity<>(getProjectEmployeeDTO, HttpStatus.OK);
+    }
+
 }
