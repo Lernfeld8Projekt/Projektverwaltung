@@ -4,6 +4,7 @@ import de.szut.lf8_starter.project.DTO.AddProjectDTO;
 import de.szut.lf8_starter.project.DTO.GetEmployeeProjectsDTO;
 import de.szut.lf8_starter.project.DTO.GetProjectDTO;
 import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
+import de.szut.lf8_starter.project.DTO.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,8 +43,8 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "Project, Employee or Customer not found",
                     content = @Content),
     })
-
     ResponseEntity<GetProjectDTO> updateProject(Long id, PatchProjectDTO patchProjectDTO);
+
     @Operation(summary = "Delete a project with its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Project Deleted",
@@ -77,6 +78,21 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "resource not found",
                     content = @Content)})
     ResponseEntity<GetProjectDTO> getProjectById(Long id);
+
+    @Operation(summary = "Add an Employee to an existing project with its project id, " +
+            " the employee id and the qualification id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "added employee to project",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetProjectEmployeeDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "invalid JSON posted",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "not authorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "employee is already in the project.",
+                    content = @Content)
+    })
+    ResponseEntity<GetProjectEmployeeDTO> addEmployeeToProject(Long projectID,AddEmployeeToProjectDTO addEmployeeToProjectDTO);
 
     @Operation(summary = "Show all Projects of employee")
     @ApiResponses(value = {
