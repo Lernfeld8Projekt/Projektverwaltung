@@ -45,6 +45,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, CONFLICT);
     }
 
+    @ExceptionHandler(EmployeeNotAvailableException.class)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "409", description = "Employee is already booked in this period",
+                    content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+    })
+    public ResponseEntity<?> handleEmployeeNotAvailableException(EmployeeNotAvailableException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, CONFLICT);
+    }
+
     @ApiResponse(responseCode = "500", description = "invalid JSON posted",
             content = @Content)
     @ExceptionHandler(Exception.class)
