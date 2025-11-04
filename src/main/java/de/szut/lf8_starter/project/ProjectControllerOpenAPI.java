@@ -86,6 +86,8 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "401", description = "not authorized",
                     content = @Content),
             @ApiResponse(responseCode = "409", description = "employee is already in the project.",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "employee is already booked in the time period.",
                     content = @Content)
     })
     ResponseEntity<GetProjectEmployeeDTO> addEmployeeToProject(Long projectID,AddEmployeeToProjectDTO addEmployeeToProjectDTO);
