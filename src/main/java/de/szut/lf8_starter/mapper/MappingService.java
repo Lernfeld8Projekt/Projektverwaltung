@@ -106,14 +106,6 @@ public class MappingService {
         return getProjectEmployeeDTO;
     }
 
-    public ProjectAssignment mapProjectEntityAndQualificationIdToProjectAssignment(ProjectEntity projectEntity, Long qualificationId) {
-        ProjectAssignment projectAssignment = new ProjectAssignment();
-        projectAssignment.setProject(projectEntity);
-        projectAssignment.setEmployeeId(projectEntity.getResponsibleEmployeeId());
-        projectAssignment.setQualificationId(qualificationId);
-        return projectAssignment;
-    }
-
     public GetEmployeeProjectsDTO mapEmployeeProjects(Long employeeId, Map<String, Object> employeeData, List<GetProjectDTO> projectDTOs) {
         String firstName = (String) employeeData.get("firstName");
         String lastName = (String) employeeData.get("lastName");

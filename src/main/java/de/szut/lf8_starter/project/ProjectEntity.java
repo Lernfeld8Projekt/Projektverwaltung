@@ -1,5 +1,6 @@
 package de.szut.lf8_starter.project;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -36,6 +37,7 @@ public class ProjectEntity {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonManagedReference
     private Set<ProjectAssignment> assignments = new HashSet<>();
 
 }

@@ -1,6 +1,7 @@
 package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.employee.EmployeeService;
+import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -57,6 +58,12 @@ public class GetEmployeeProjectsIT extends AbstractIntegrationTest {
         project.setPlannedEndDate(LocalDate.parse("2024-12-31"));
         projectRepository.save(project);
 
+        ProjectAssignment assignment = new ProjectAssignment();
+        assignment.setEmployeeId(5L);
+        assignment.setProject(project);
+        project.getAssignments().add(assignment);
+        projectRepository.save(project);
+
         this.mockMvc.perform(get("/project/employee/{employeeId}", 5)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -67,4 +74,31 @@ public class GetEmployeeProjectsIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.projects", hasSize(1)))
                 .andExpect(jsonPath("$.projects[0].title", is("Employee Project")));
     }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void employeeHasNoProjects() throws Exception {
+        Mockito.doReturn(
+                Map.of(
+                        "firstName", "Alice",
+                        "lastName", "Smith",
+                        "skillSet", List.of(Map.of("skill","Java"))
+                )
+        ).when(employeeService).getEmployeeById(10L);
+
+        this.mockMvc.perform(get("/project/employee/{employeeId}", 10).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.projects", hasSize(0)));
+    }
+
+    @Test
+    @WithMockUser(roles = "user")
+    void employeeDoesNotExist() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException("Employee not found"))
+                .when(employeeService).getEmployeeById(99L);
+
+        this.mockMvc.perform(get("/project/employee/{employeeId}", 99).with(csrf()))
+                .andExpect(status().isNotFound());
+    }
+
 }
