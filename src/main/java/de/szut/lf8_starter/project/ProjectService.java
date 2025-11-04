@@ -6,7 +6,6 @@ import de.szut.lf8_starter.exceptionHandling.DateNotValidException;
 import de.szut.lf8_starter.exceptionHandling.EmployeeAlreadyInThisProject;
 import de.szut.lf8_starter.exceptionHandling.EmployeeNotAvailableException;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
-import de.szut.lf8_starter.mapper.MappingService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
