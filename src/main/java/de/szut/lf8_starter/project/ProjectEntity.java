@@ -1,6 +1,5 @@
 package de.szut.lf8_starter.project;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

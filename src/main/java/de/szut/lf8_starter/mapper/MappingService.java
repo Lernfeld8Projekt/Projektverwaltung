@@ -109,14 +109,14 @@ public class MappingService {
         response.setEmployeeLastName(name.getLastName());
         List<GetProjectFromEmployeeDTO> getProjectFromEmployeeDTOList = new ArrayList<>();
         for (ProjectEntity project : projects){
-            GetProjectFromEmployeeDTO getProjectFromEmployeeDTO = mapProjectToGetEmployeeReducedProjectDTO(employeeId, project);
+            GetProjectFromEmployeeDTO getProjectFromEmployeeDTO = mapProjectToGetProjectFromEmployeeDTO(employeeId, project);
             getProjectFromEmployeeDTOList.add(getProjectFromEmployeeDTO);
         }
         response.setProjects(getProjectFromEmployeeDTOList);
         return response;
     }
 
-    private static GetProjectFromEmployeeDTO mapProjectToGetEmployeeReducedProjectDTO(Long employeeId, ProjectEntity project) {
+    private static GetProjectFromEmployeeDTO mapProjectToGetProjectFromEmployeeDTO(Long employeeId, ProjectEntity project) {
         GetProjectFromEmployeeDTO getProjectFromEmployeeDTO = new GetProjectFromEmployeeDTO();
         getProjectFromEmployeeDTO.setId(project.getId());
         getProjectFromEmployeeDTO.setTitle(project.getTitle());
