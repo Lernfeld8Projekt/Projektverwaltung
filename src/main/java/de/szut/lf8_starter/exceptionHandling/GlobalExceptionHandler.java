@@ -61,7 +61,8 @@ public class GlobalExceptionHandler {
                     content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
     })
     public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        String errormessage = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), errormessage, request.getDescription(false));
         return new ResponseEntity<>(errorDetails, INTERNAL_SERVER_ERROR);
     }
 
