@@ -9,5 +9,5 @@ public class GetEmployeeProjectsDTO {
     private Long employeeId;
     private String employeeFirstName;
     private String employeeLastName;
-    private List<GetEmployeeReducedProjectDTO> projects;
+    private List<GetProjectFromEmployeeDTO> projects;
 }

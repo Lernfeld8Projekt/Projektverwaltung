@@ -107,28 +107,28 @@ public class MappingService {
         response.setEmployeeId(employeeId);
         response.setEmployeeFirstName(name.getFirstName());
         response.setEmployeeLastName(name.getLastName());
-        List<GetEmployeeReducedProjectDTO> getEmployeeReducedProjectDTOList = new ArrayList<>();
+        List<GetProjectFromEmployeeDTO> getProjectFromEmployeeDTOList = new ArrayList<>();
         for (ProjectEntity project : projects){
-            GetEmployeeReducedProjectDTO getEmployeeReducedProjectDTO = mapProjectToGetEmployeeReducedProjectDTO(employeeId, project);
-            getEmployeeReducedProjectDTOList.add(getEmployeeReducedProjectDTO);
+            GetProjectFromEmployeeDTO getProjectFromEmployeeDTO = mapProjectToGetEmployeeReducedProjectDTO(employeeId, project);
+            getProjectFromEmployeeDTOList.add(getProjectFromEmployeeDTO);
         }
-        response.setProjects(getEmployeeReducedProjectDTOList);
+        response.setProjects(getProjectFromEmployeeDTOList);
         return response;
     }
 
-    private static GetEmployeeReducedProjectDTO mapProjectToGetEmployeeReducedProjectDTO(Long employeeId, ProjectEntity project) {
-        GetEmployeeReducedProjectDTO getEmployeeReducedProjectDTO = new GetEmployeeReducedProjectDTO();
-        getEmployeeReducedProjectDTO.setId(project.getId());
-        getEmployeeReducedProjectDTO.setTitle(project.getTitle());
-        getEmployeeReducedProjectDTO.setStartDate(project.getStartDate());
-        getEmployeeReducedProjectDTO.setPlannedEndDate(project.getPlannedEndDate());
-        getEmployeeReducedProjectDTO.setActualEndDate(project.getActualEndDate());
+    private static GetProjectFromEmployeeDTO mapProjectToGetEmployeeReducedProjectDTO(Long employeeId, ProjectEntity project) {
+        GetProjectFromEmployeeDTO getProjectFromEmployeeDTO = new GetProjectFromEmployeeDTO();
+        getProjectFromEmployeeDTO.setId(project.getId());
+        getProjectFromEmployeeDTO.setTitle(project.getTitle());
+        getProjectFromEmployeeDTO.setStartDate(project.getStartDate());
+        getProjectFromEmployeeDTO.setPlannedEndDate(project.getPlannedEndDate());
+        getProjectFromEmployeeDTO.setActualEndDate(project.getActualEndDate());
         Set<ProjectAssignment> projectAssignmentsSet = project.getAssignments();
         for (ProjectAssignment assignment : projectAssignmentsSet){
             if (assignment.getEmployeeId().equals(employeeId)) {
-                getEmployeeReducedProjectDTO.setEmployeeQualification(assignment.getQualificationId());
+                getProjectFromEmployeeDTO.setEmployeeQualification(assignment.getQualificationId());
             }
         }
-        return getEmployeeReducedProjectDTO;
+        return getProjectFromEmployeeDTO;
     }
 }
