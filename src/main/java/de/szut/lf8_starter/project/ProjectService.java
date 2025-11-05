@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -41,9 +42,8 @@ public class ProjectService {
         return this.projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
     }
 
-    public ProjectEntity patchProject(Long id, Map<String,Object> fields) {
-        ProjectEntity entityToPatch = this.projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found on id: " + id));
+    public ProjectEntity patchProject(Long id, Map<String, Object> fields) {
+        ProjectEntity entityToPatch = this.getProjectById(id);
 
         fields.forEach((key, value) -> {
             Field field = ReflectionUtils.findField(ProjectEntity.class, key);
@@ -55,6 +55,7 @@ public class ProjectService {
 
         return projectRepository.save(entityToPatch);
     }
+
     private void validateProjectEntity(ProjectEntity projectEntity) {
         if (projectEntity.getStartDate() != null && projectEntity.getStartDate().isAfter(projectEntity.getPlannedEndDate())) {
             throw new DateNotValidException("Start date cannot be after planned end date!");
@@ -74,8 +75,7 @@ public class ProjectService {
     }
 
     public void deleteProjectById(final Long id) {
-        ProjectEntity projectEntity = this.projectRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Project with ID " + id + " not found."));
+        ProjectEntity projectEntity = this.getProjectById(id);
         this.projectRepository.delete(projectEntity);
     }
 
@@ -92,7 +92,7 @@ public class ProjectService {
         this.employeeService.checkIfEmployeeExists(employeeId);
         this.employeeService.checkIfEmployeeHaveQualification(employeeId, newProjectAssignment.getQualificationId());
 
-        if(project.getActualEndDate() == null) {
+        if (project.getActualEndDate() == null) {
             this.isEmployeeAvailable(employeeId, project.getStartDate(), project.getPlannedEndDate());
         }
 
@@ -104,7 +104,7 @@ public class ProjectService {
 
     public boolean isEmployeeInProject(Set<ProjectAssignment> oldProjectAssignments, Long employeeId) {
         for (ProjectAssignment oldProjectAssignment : oldProjectAssignments) {
-            if (oldProjectAssignment.getEmployeeId() == employeeId) {
+            if (Objects.equals(oldProjectAssignment.getEmployeeId(), employeeId)) {
                 return true;
             }
         }
@@ -129,5 +129,20 @@ public class ProjectService {
                 }
             }
         }
+    }
+
+    public void removeEmployeeFromProject(Long projectId, Long employeeId) {
+        ProjectEntity project = this.getProjectById(projectId);
+        Set<ProjectAssignment> assignments = project.getAssignments();
+
+        if (!employeeService.checkIfEmployeeExists(employeeId)) {
+            throw new ResourceNotFoundException("Employee not found on id: " + employeeId);
+        }
+        if (!isEmployeeInProject(assignments, employeeId)) {
+            throw new ResourceNotFoundException("The Employee with ID " + employeeId + " is not a part of the project!");
+        }
+
+        project.getAssignments().removeIf(assignment -> Objects.equals(assignment.getEmployeeId(), employeeId));
+        projectRepository.save(project);
     }
 }
