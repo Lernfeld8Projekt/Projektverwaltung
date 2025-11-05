@@ -1,4 +1,6 @@
-# Starter für das LF08 Projekt
+# Projekt Management Service
+
+The Project Management Service API manages the projects of HighTec GmbH, including their assigned employees and related information such as customers and project goals. It offers functionality to create, read, update, and delete projects, as well as to assign, remove or read employees to existing projects. The API is organized around REST. It has predictable resource-oriented URLs, accepts JSON-encoded request bodies, returns JSON-encoded responses, uses standard HTTP response codes and authentication.
 
 ## Requirements
 * Docker https://docs.docker.com/get-docker/
@@ -6,7 +8,7 @@
 
 ## Endpunkt
 ```
-http://localhost:8080
+http://localhost:8080/project
 ```
 ## Swagger
 ```
