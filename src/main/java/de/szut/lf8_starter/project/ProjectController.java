@@ -2,21 +2,24 @@ package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.employee.NameDTO;
-import de.szut.lf8_starter.project.DTO.GetEmployeeProjectsDTO;
+import de.szut.lf8_starter.project.DTO.AddDTO.AddEmployeeToProjectDTO;
+import de.szut.lf8_starter.project.DTO.AddDTO.AddProjectDTO;
+import de.szut.lf8_starter.project.DTO.GetDTO.GetAllEmployeesFromProjectDTO;
+import de.szut.lf8_starter.project.DTO.GetDTO.GetEmployeeProjectsDTO;
 import de.szut.lf8_starter.mapper.MappingService;
-import de.szut.lf8_starter.project.DTO.*;
+import de.szut.lf8_starter.project.DTO.GetDTO.GetProjectDTO;
+import de.szut.lf8_starter.project.DTO.GetDTO.GetProjectEmployeeDTO;
+import de.szut.lf8_starter.project.DTO.PatchDTO.PatchProjectDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/project")

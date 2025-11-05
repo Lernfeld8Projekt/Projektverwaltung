@@ -1,4 +1,4 @@
-package de.szut.lf8_starter.project.DTO;
+package de.szut.lf8_starter.project.DTO.AddDTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

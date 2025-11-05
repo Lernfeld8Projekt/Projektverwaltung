@@ -1,12 +1,11 @@
-package de.szut.lf8_starter.project.DTO;
+package de.szut.lf8_starter.project.DTO.PatchDTO;
 
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-public class GetProjectDTO {
-    private Long id;
+public class PatchProjectDTO {
     private String title;
     private Long responsibleEmployeeId;
     private Long customerId;

@@ -1,13 +1,18 @@
 package de.szut.lf8_starter.project;
 
-import de.szut.lf8_starter.project.DTO.*;
+import de.szut.lf8_starter.project.DTO.AddDTO.AddEmployeeToProjectDTO;
+import de.szut.lf8_starter.project.DTO.AddDTO.AddProjectDTO;
+import de.szut.lf8_starter.project.DTO.GetDTO.GetAllEmployeesFromProjectDTO;
+import de.szut.lf8_starter.project.DTO.GetDTO.GetEmployeeProjectsDTO;
+import de.szut.lf8_starter.project.DTO.GetDTO.GetProjectDTO;
+import de.szut.lf8_starter.project.DTO.GetDTO.GetProjectEmployeeDTO;
+import de.szut.lf8_starter.project.DTO.PatchDTO.PatchProjectDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 

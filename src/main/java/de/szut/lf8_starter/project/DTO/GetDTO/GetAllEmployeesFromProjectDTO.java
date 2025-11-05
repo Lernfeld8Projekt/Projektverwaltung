@@ -1,6 +1,5 @@
-package de.szut.lf8_starter.project.DTO;
+package de.szut.lf8_starter.project.DTO.GetDTO;
 
-import de.szut.lf8_starter.project.ProjectAssignment;
 import lombok.Data;
 
 import java.util.List;
