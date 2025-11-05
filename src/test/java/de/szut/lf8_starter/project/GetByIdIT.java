@@ -1,6 +1,7 @@
 package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -16,6 +17,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GetByIdIT extends AbstractIntegrationTest {
     @Autowired
     private ProjectRepository projectRepository;
+
+    @BeforeEach
+    void setUp() {
+        this.projectRepository.deleteAll();
+    }
 
     @Test
     void authorization() throws Exception {
@@ -38,7 +44,7 @@ public class GetByIdIT extends AbstractIntegrationTest {
 
         projectRepository.save(project);
 
-        final var contentAsString = this.mockMvc.perform(get("/project/1")
+        this.mockMvc.perform(get("/project/{id}", project.getId())
                         .with(csrf()))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("title", is("Good Project")))

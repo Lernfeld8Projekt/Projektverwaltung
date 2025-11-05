@@ -62,7 +62,7 @@ public class GetEmployeeProjectsIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.employeeFirstName", is("John")))
                 .andExpect(jsonPath("$.employeeLastName", is("Doe")))
                 .andExpect(jsonPath("$.projects", hasSize(1)))
-                .andExpect(jsonPath("$.projects[0].id", is(1)))
+                .andExpect(jsonPath("$.projects[0].id", is(project.getId().intValue())))
                 .andExpect(jsonPath("$.projects[0].title", is("Employee Project")))
                 .andExpect(jsonPath("$.projects[0].startDate", is("2024-01-01")))
                 .andExpect(jsonPath("$.projects[0].plannedEndDate", is("2024-12-31")))
