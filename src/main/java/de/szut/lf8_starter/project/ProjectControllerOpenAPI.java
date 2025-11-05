@@ -104,6 +104,17 @@ public interface ProjectControllerOpenAPI {
     })
     ResponseEntity<Void> removeEmployeeFromProject(Long projectID, Long employeeID);
 
+    @Operation(summary = "Show all Projects of employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "projects with given employee-id",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = GetEmployeeProjectsDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "not authorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "resource not found",
+                    content = @Content)})
+    ResponseEntity<GetEmployeeProjectsDTO> getProjectsByEmployeeId(Long id);
+
     @Operation(summary = "Get all Employees from a project with its project id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of employees from the project",

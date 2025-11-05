@@ -12,6 +12,7 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Map;
 
 import java.util.List;
@@ -145,5 +146,25 @@ public class ProjectService {
 
         project.getAssignments().removeIf(assignment -> Objects.equals(assignment.getEmployeeId(), employeeId));
         projectRepository.save(project);
+    }
+
+    public List<ProjectEntity> getProjectsByEmployeeId(Long employeeId) {
+        if (!employeeService.checkIfEmployeeExists(employeeId)) {
+            throw new ResourceNotFoundException("Employee not found on id: " + employeeId);
+        }
+
+        List<ProjectEntity> allProjects = this.getAllProjects();
+        List<ProjectEntity> employeeProjects = new ArrayList<>();
+
+        for (ProjectEntity project : allProjects) {
+            Set<ProjectAssignment> assignments = project.getAssignments();
+            for (ProjectAssignment assignment : assignments) {
+                if (assignment.getEmployeeId().equals(employeeId)) {
+                    employeeProjects.add(project);
+                    break;
+                }
+            }
+        }
+        return employeeProjects;
     }
 }

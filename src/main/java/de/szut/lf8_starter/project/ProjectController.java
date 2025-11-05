@@ -2,6 +2,7 @@ package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.employee.NameDTO;
+import de.szut.lf8_starter.project.DTO.GetEmployeeProjectsDTO;
 import de.szut.lf8_starter.mapper.MappingService;
 import de.szut.lf8_starter.project.DTO.*;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/project")
@@ -86,5 +88,13 @@ public class ProjectController implements ProjectControllerOpenAPI {
     public ResponseEntity<Void> removeEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId){
         projectService.removeEmployeeFromProject(id, employeeId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/employee/{employeeId}")
+    public ResponseEntity<GetEmployeeProjectsDTO> getProjectsByEmployeeId(@PathVariable Long employeeId) {
+        NameDTO name = employeeService.getEmployeeName(employeeId);
+        List<ProjectEntity> projects = projectService.getProjectsByEmployeeId(employeeId);
+        GetEmployeeProjectsDTO response = mappingService.mapEmployeeProjects(employeeId, name, projects);
+        return ResponseEntity.ok(response);
     }
 }
