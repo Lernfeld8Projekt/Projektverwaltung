@@ -53,6 +53,7 @@ public class GetByIdIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(roles = "user")
     void noProjectByIdFound() throws Exception {
+        this.projectRepository.deleteAll();
         this.mockMvc.perform(get("/project/1")
                         .with(csrf()))
                 .andExpect(status().isNotFound())
