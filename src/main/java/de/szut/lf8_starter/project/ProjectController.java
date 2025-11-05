@@ -68,13 +68,20 @@ public class ProjectController implements ProjectControllerOpenAPI {
         return new ResponseEntity<>(projectDTO, HttpStatus.OK);
     }
 
-    @PostMapping("/{projectID}")
-    public ResponseEntity<GetProjectEmployeeDTO> addEmployeeToProject(@PathVariable Long projectID, @Valid @RequestBody AddEmployeeToProjectDTO addEmployeeToProjectDTO) {
-        ProjectAssignment projectAssignment = this.mappingService.mapAddEmployeeToProjectDTOToProjectAssignment(projectID, addEmployeeToProjectDTO);
-        this.projectService.addEmployeeToProject(projectID, projectAssignment);
+    @PostMapping("/{id}")
+    public ResponseEntity<GetProjectEmployeeDTO> addEmployeeToProject(@PathVariable Long id, @Valid @RequestBody AddEmployeeToProjectDTO addEmployeeToProjectDTO) {
+        ProjectAssignment projectAssignment = this.mappingService.mapAddEmployeeToProjectDTOToProjectAssignment(id, addEmployeeToProjectDTO);
+        this.projectService.addEmployeeToProject(id, projectAssignment);
         NameDTO nameDTO = this.employeeService.getEmployeeName(projectAssignment.getEmployeeId());
         GetProjectEmployeeDTO getProjectEmployeeDTO = this.mappingService.mapProjectAssignmentToGetProjectEmployeeDTO(projectAssignment, nameDTO);
         return new ResponseEntity<>(getProjectEmployeeDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/employees")
+    public ResponseEntity<GetAllEmployeesFromProjectDTO> getAllEmployeesFromProject(@PathVariable Long id) {
+        ProjectEntity project = this.projectService.getProjectById(id);
+        GetAllEmployeesFromProjectDTO getAllEmployeesFromProjectDTO = this.mappingService.mapProjectEntityToGetAllEmployeesFromProjectDTO(project);
+        return new ResponseEntity<>(getAllEmployeesFromProjectDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/{employeeId}")

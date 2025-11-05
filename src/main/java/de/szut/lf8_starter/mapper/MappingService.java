@@ -1,13 +1,10 @@
 package de.szut.lf8_starter.mapper;
 
+import de.szut.lf8_starter.employee.EmployeeService;
 import de.szut.lf8_starter.employee.NameDTO;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_starter.project.DTO.*;
 import de.szut.lf8_starter.project.ProjectAssignment;
-import de.szut.lf8_starter.project.DTO.AddProjectDTO;
-import de.szut.lf8_starter.project.DTO.GetEmployeeProjectsDTO;
-import de.szut.lf8_starter.project.DTO.GetProjectDTO;
-import de.szut.lf8_starter.project.DTO.PatchProjectDTO;
 import de.szut.lf8_starter.project.ProjectEntity;
 import de.szut.lf8_starter.project.ProjectRepository;
 import org.springframework.stereotype.Service;
@@ -18,12 +15,14 @@ import java.util.*;
 @Service
 public class MappingService {
     private final ProjectRepository projectRepository;
+    private final EmployeeService employeeService;
 
-    public MappingService(ProjectRepository projectRepository) {
+    public MappingService(ProjectRepository projectRepository, EmployeeService employeeService) {
         this.projectRepository = projectRepository;
+        this.employeeService = employeeService;
     }
 
-    public ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO){
+    public ProjectEntity mapAddProjectDTOtoProjectEntity(AddProjectDTO addProjectDTO) {
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setTitle(addProjectDTO.getTitle());
         projectEntity.setResponsibleEmployeeId(addProjectDTO.getResponsibleEmployeeId());
@@ -35,7 +34,7 @@ public class MappingService {
         return projectEntity;
     }
 
-    public GetProjectDTO mapProjectEntityToGetProjectDTO(ProjectEntity projectEntity){
+    public GetProjectDTO mapProjectEntityToGetProjectDTO(ProjectEntity projectEntity) {
         GetProjectDTO getProjectDTO = new GetProjectDTO();
         getProjectDTO.setId(projectEntity.getId());
         getProjectDTO.setTitle(projectEntity.getTitle());
@@ -49,7 +48,7 @@ public class MappingService {
         return getProjectDTO;
     }
 
-    public Map<String,Object> mapPatchProjectDTOtoMapWithFields(PatchProjectDTO patchProjectDTO) {
+    public Map<String, Object> mapPatchProjectDTOtoMapWithFields(PatchProjectDTO patchProjectDTO) {
         Map<String, Object> fields = new HashMap<>();
 
         if (patchProjectDTO == null) {
@@ -91,13 +90,13 @@ public class MappingService {
         return projectAssignment;
     }
 
-    public GetProjectEmployeeDTO mapProjectAssignmentToGetProjectEmployeeDTO(ProjectAssignment projectAssignment, NameDTO name) {
+    public GetProjectEmployeeDTO mapProjectAssignmentToGetProjectEmployeeDTO(ProjectAssignment projectAssignment, NameDTO nameDTO) {
         GetProjectEmployeeDTO getProjectEmployeeDTO = new GetProjectEmployeeDTO();
         getProjectEmployeeDTO.setProjectId(projectAssignment.getProject().getId());
         getProjectEmployeeDTO.setTitle(projectAssignment.getProject().getTitle());
         getProjectEmployeeDTO.setEmployeeId(projectAssignment.getEmployeeId());
-        getProjectEmployeeDTO.setEmployeeLastName(name.getLastName());
-        getProjectEmployeeDTO.setEmployeeFirstName(name.getFirstName());
+        getProjectEmployeeDTO.setEmployeeLastName(nameDTO.getLastName());
+        getProjectEmployeeDTO.setEmployeeFirstName(nameDTO.getFirstName());
         getProjectEmployeeDTO.setQualification(projectAssignment.getQualificationId());
         return getProjectEmployeeDTO;
     }
@@ -108,7 +107,7 @@ public class MappingService {
         response.setEmployeeFirstName(name.getFirstName());
         response.setEmployeeLastName(name.getLastName());
         List<GetProjectFromEmployeeDTO> getProjectFromEmployeeDTOList = new ArrayList<>();
-        for (ProjectEntity project : projects){
+        for (ProjectEntity project : projects) {
             GetProjectFromEmployeeDTO getProjectFromEmployeeDTO = mapProjectToGetProjectFromEmployeeDTO(employeeId, project);
             getProjectFromEmployeeDTOList.add(getProjectFromEmployeeDTO);
         }
@@ -124,11 +123,31 @@ public class MappingService {
         getProjectFromEmployeeDTO.setPlannedEndDate(project.getPlannedEndDate());
         getProjectFromEmployeeDTO.setActualEndDate(project.getActualEndDate());
         Set<ProjectAssignment> projectAssignmentsSet = project.getAssignments();
-        for (ProjectAssignment assignment : projectAssignmentsSet){
+        for (ProjectAssignment assignment : projectAssignmentsSet) {
             if (assignment.getEmployeeId().equals(employeeId)) {
                 getProjectFromEmployeeDTO.setEmployeeQualification(assignment.getQualificationId());
             }
         }
         return getProjectFromEmployeeDTO;
+    }
+
+    public GetAllEmployeesFromProjectDTO mapProjectEntityToGetAllEmployeesFromProjectDTO(ProjectEntity project) {
+        GetAllEmployeesFromProjectDTO projectDTO = new GetAllEmployeesFromProjectDTO();
+        projectDTO.setId(project.getId());
+        projectDTO.setTitle(project.getTitle());
+
+        List<GetEmployeeDTO> employees = new ArrayList<>();
+        for (ProjectAssignment projectAssignment : project.getAssignments()) {
+            NameDTO nameDTO = this.employeeService.getEmployeeName(projectAssignment.getEmployeeId());
+            GetEmployeeDTO getEmployeeDTO = new GetEmployeeDTO();
+            getEmployeeDTO.setId(projectAssignment.getEmployeeId());
+            getEmployeeDTO.setLastName(nameDTO.getLastName());
+            getEmployeeDTO.setFirstName(nameDTO.getFirstName());
+            getEmployeeDTO.setQualification(projectAssignment.getQualificationId());
+            employees.add(getEmployeeDTO);
+        }
+
+        projectDTO.setEmployees(employees);
+        return projectDTO;
     }
 }
