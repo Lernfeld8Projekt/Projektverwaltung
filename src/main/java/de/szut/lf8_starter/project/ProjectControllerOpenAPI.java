@@ -102,7 +102,7 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "employee is not in the project.",
                     content = @Content)
     })
-   ResponseEntity<Void> removeEmployeeFromProject(Long projectID, Long employeeID);
+    ResponseEntity<Void> removeEmployeeFromProject(Long projectID, Long employeeID);
 
     @Operation(summary = "Get all Employees from a project with its project id.")
     @ApiResponses(value = {
@@ -113,5 +113,8 @@ public interface ProjectControllerOpenAPI {
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "not authorized",
                     content = @Content),
+            @ApiResponse(responseCode = "404", description = "project not found",
+                    content = @Content)
     })
     ResponseEntity<GetAllEmployeesFromProjectDTO> getAllEmployeesFromProject(Long id);
+}
