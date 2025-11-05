@@ -31,17 +31,14 @@ public class OpenAPIConfiguration {
         return new OpenAPI()
                 .addServersItem(new Server().url(this.context.getContextPath()))
                 .info(new Info()
-                        .title("LF8 project starter")
-                        .description("\n## Auth\n" +
-                                "\n## Authentication\n" + "\nThis Project service uses JWTs to authenticate requests. You will receive a bearer token by making a POST-Request in IntelliJ on:\n\n" +
-                                "\n" +
-                                "```\nPOST http://keycloak.szut.dev/auth/realms/szut/protocol/openid-connect/token\nContent-Type: application/x-www-form-urlencoded\ngrant_type=password&client_id=employee-management-service&username=user&password=test\n```\n" +
-                                "\n" +
-                                "\nor by CURL\n" +
-                                "```\ncurl -X POST 'http://keycloak.szut.dev/auth/realms/szut/protocol/openid-connect/token'\n--header 'Content-Type: application/x-www-form-urlencoded'\n--data-urlencode 'grant_type=password'\n--data-urlencode 'client_id=employee-management-service'\n--data-urlencode 'username=user'\n--data-urlencode 'password=test'\n```\n" +
-                                "\nTo get a bearer-token in Postman, you have to follow the instructions in \n [Postman-Documentation](https://documenter.getpostman.com/view/7294517/SzmfZHnd).")
+                        .title("Project Management Service")
+                        .description("The Project Management Service API manages the projects of HighTec GmbH, including their assigned employees and " +
+                                "related information such as customers and project goals." +
+                                "It offers functionality to create, read, update, and delete projects, as well as to assign, remove or read employees to existing projects. " +
+                                "The API is organized around REST. It has predictable resource-oriented URLs, accepts JSON-encoded request bodies, " +
+                                "returns JSON-encoded responses, uses standard HTTP response codes and authentication.")
 
-                        .version("0.1"))
+                        .version("1.0"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(
                         new Components()

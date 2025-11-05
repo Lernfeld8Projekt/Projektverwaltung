@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -20,7 +21,6 @@ import static org.springframework.http.HttpStatus.OK;
 public class ProjectController implements ProjectControllerOpenAPI {
     private final MappingService mappingService;
     private final ProjectService projectService;
-
     private final EmployeeService employeeService;
 
     public ProjectController(MappingService mappingService, ProjectService projectService, EmployeeService employeeService) {
@@ -82,4 +82,9 @@ public class ProjectController implements ProjectControllerOpenAPI {
         return new ResponseEntity<>(getAllEmployeesFromProjectDTO, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}/{employeeId}")
+    public ResponseEntity<Void> removeEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId){
+        projectService.removeEmployeeFromProject(id, employeeId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
