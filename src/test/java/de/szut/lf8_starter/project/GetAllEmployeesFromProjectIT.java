@@ -151,6 +151,7 @@ public class GetAllEmployeesFromProjectIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(roles = "user")
     void getEmployeesFromNonExistingProject() throws Exception {
+        this.projectRepository.deleteAll();
         this.mockMvc.perform(get("/project/{id}/employees", 1)
                 .with(csrf()))
                 .andExpect(status().isNotFound())

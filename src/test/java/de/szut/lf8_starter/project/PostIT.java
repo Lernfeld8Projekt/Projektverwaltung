@@ -149,19 +149,17 @@ public class PostIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(roles = "user")
     void whenStartDateIsAfterPlannedEndDate() throws Exception {
-        var projectEntity = new ProjectEntity();
-        projectEntity.setTitle("BFK");
-        projectEntity.setResponsibleEmployeeId(1L);
-        projectEntity.setCustomerId(1L);
-        projectEntity.setCustomerRepresentativeName("Max Meyer");
-        projectEntity.setGoal("Project fertig machen");
-        projectEntity.setStartDate(LocalDate.parse("2026-07-07"));
-        projectEntity.setPlannedEndDate(LocalDate.parse("2028-01-01"));
-        projectRepository.save(projectEntity);
+        Mockito.doReturn(true).when(employeeService).checkIfEmployeeExists(1L);
+        Mockito.doReturn(true).when(customerService).checkIfCustomerExists(1L);
 
         final String content = """
                   {
-                    "startDate": "2027-01-01",
+                    "title": "BFK",
+                    "responsibleEmployeeId": 1,
+                    "customerId": 1,
+                    "customerRepresentativeName": "Max Meyer",
+                    "goal": "Project fertig machen",
+                    "startDate": "2027-07-07",
                     "plannedEndDate": "2026-01-01"
                 }
                 """;
