@@ -38,6 +38,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:postgresql:1.20.0")
+    implementation("org.springframework.boot:spring-boot-starter-validation:3.5.7")
 }
 
 tasks.withType<Test> {

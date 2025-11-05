@@ -1,6 +1,5 @@
 package de.szut.lf8_starter.testcontainers;
 
-import de.szut.lf8_starter.examples.hello.HelloRepository;
 import de.szut.lf8_starter.project.ProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +24,5 @@ public class AbstractIntegrationTest {
     protected MockMvc mockMvc;
 
     @Autowired
-    protected HelloRepository helloRepository;
-
-    @Autowired
     protected ProjectRepository projectRepository;
-
-    @BeforeEach
-    void setUp() {
-        helloRepository.deleteAll();
-    }
 }

@@ -55,6 +55,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, CONFLICT);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "500", description = "property not valid",
+                    content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+    })
+    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, INTERNAL_SERVER_ERROR);
+    }
+
     @ApiResponse(responseCode = "500", description = "invalid JSON posted",
             content = @Content)
     @ExceptionHandler(Exception.class)
