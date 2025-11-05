@@ -79,7 +79,7 @@ public interface ProjectControllerOpenAPI {
                     content = @Content)})
     ResponseEntity<GetProjectDTO> getProjectById(Long id);
 
-    @Operation(summary = "Add an Employee to an existing project with its project id, " +
+    @Operation(summary = "Add an Employee to an existing project with project id, " +
             " the employee id and the qualification id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "added employee to project",
@@ -92,7 +92,20 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "409", description = "conflict while adding a employee to a project.",
                     content = @Content),
     })
-    ResponseEntity<GetProjectEmployeeDTO> addEmployeeToProject(Long projectID,AddEmployeeToProjectDTO addEmployeeToProjectDTO);
+    ResponseEntity<GetProjectEmployeeDTO> addEmployeeToProject(Long projectID, AddEmployeeToProjectDTO addEmployeeToProjectDTO);
+
+    @Operation(summary = "Remove an Employee from an existing project with project id and the employee id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "removes employee from project",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "invalid JSON posted",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "not authorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "employee is not in the project.",
+                    content = @Content)
+    })
+    ResponseEntity<Void> removeEmployeeFromProject(Long projectID, Long employeeID);
 
     @Operation(summary = "Show all Projects of employee")
     @ApiResponses(value = {

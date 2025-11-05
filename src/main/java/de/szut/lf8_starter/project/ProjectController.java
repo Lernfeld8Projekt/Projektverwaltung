@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectController implements ProjectControllerOpenAPI {
     private final MappingService mappingService;
     private final ProjectService projectService;
-
     private final EmployeeService employeeService;
 
     public ProjectController(MappingService mappingService, ProjectService projectService, EmployeeService employeeService) {
@@ -75,6 +75,12 @@ public class ProjectController implements ProjectControllerOpenAPI {
         NameDTO nameDTO = this.employeeService.getEmployeeName(projectAssignment.getEmployeeId());
         GetProjectEmployeeDTO getProjectEmployeeDTO = this.mappingService.mapProjectAssignmentToGetProjectEmployeeDTO(projectAssignment, nameDTO);
         return new ResponseEntity<>(getProjectEmployeeDTO, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/{employeeId}")
+    public ResponseEntity<Void> removeEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId){
+        projectService.removeEmployeeFromProject(id, employeeId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/employee/{employeeId}")

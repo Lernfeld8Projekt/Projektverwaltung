@@ -34,10 +34,8 @@ public class ProjectEntity {
 
     private LocalDate actualEndDate = null;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @JsonManagedReference
     private Set<ProjectAssignment> assignments = new HashSet<>();
-
 }
